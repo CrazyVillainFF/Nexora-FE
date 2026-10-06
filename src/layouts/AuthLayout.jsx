@@ -1,0 +1,137 @@
+import React from 'react';
+import { Box, Container, Grid, Typography, Stack, Chip, Card } from '@mui/material';
+import { Outlet, useNavigate } from 'react-router-dom';
+import HubRoundedIcon from '@mui/icons-material/HubRounded';
+import AutoAwesomeRoundedIcon from '@mui/icons-material/AutoAwesomeRounded';
+import SecurityRoundedIcon from '@mui/icons-material/SecurityRounded';
+import GroupsRoundedIcon from '@mui/icons-material/GroupsRounded';
+
+const AuthLayout = () => {
+  const navigate = useNavigate();
+
+  return (
+    <Box
+      sx={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        bgcolor: 'background.default',
+        py: { xs: 3, md: 6 },
+        px: { xs: 2, sm: 3 },
+      }}
+    >
+      <Container maxWidth="lg">
+        <Grid container spacing={4} alignItems="center" justifyContent="center">
+          {/* Left Marketing Pillar (Hidden on mobile) */}
+          <Grid item xs={12} md={6} sx={{ display: { xs: 'none', md: 'block' } }}>
+            <Box sx={{ pr: { md: 4 } }}>
+              {/* Brand Header */}
+              <Stack
+                direction="row"
+                alignItems="center"
+                spacing={1.5}
+                onClick={() => navigate('/')}
+                sx={{ cursor: 'pointer', mb: 3 }}
+              >
+                <Box
+                  sx={{
+                    width: 44,
+                    height: 44,
+                    borderRadius: 3,
+                    background: 'linear-gradient(135deg, #4F46E5 0%, #06B6D4 100%)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#fff',
+                    boxShadow: '0 8px 24px rgba(79, 70, 229, 0.4)',
+                  }}
+                >
+                  <HubRoundedIcon sx={{ fontSize: 26 }} />
+                </Box>
+                <Typography variant="h4" fontWeight={800} letterSpacing="-0.03em">
+                  NEXORA
+                </Typography>
+              </Stack>
+
+              <Chip
+                icon={<AutoAwesomeRoundedIcon sx={{ fontSize: '14px !important', color: 'primary.main' }} />}
+                label="The Next-Generation Executive & Engineering Network"
+                size="small"
+                sx={{
+                  bgcolor: 'action.hover',
+                  color: 'primary.main',
+                  fontWeight: 700,
+                  mb: 3,
+                  py: 0.5,
+                }}
+              />
+
+              <Typography variant="h3" fontWeight={800} sx={{ lineHeight: 1.15, mb: 2 }}>
+                Build high-leverage professional relationships.
+              </Typography>
+
+              <Typography variant="body1" color="text.secondary" sx={{ mb: 4, fontSize: '1.05rem', lineHeight: 1.6 }}>
+                Connect with leading architects, startup founders, design leaders, and engineers shaping the future of technology.
+              </Typography>
+
+              {/* Benefit highlights */}
+              <Stack spacing={2.5}>
+                <Stack direction="row" spacing={2} alignItems="center">
+                  <Box
+                    sx={{
+                      p: 1.25,
+                      borderRadius: 2.5,
+                      bgcolor: 'action.hover',
+                      color: 'primary.main',
+                      display: 'flex',
+                    }}
+                  >
+                    <GroupsRoundedIcon />
+                  </Box>
+                  <Box>
+                    <Typography variant="subtitle2" fontWeight={700}>
+                      Curated Professional Ecosystem
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      No spam, noisy algorithmic clutter, or generic clickbait.
+                    </Typography>
+                  </Box>
+                </Stack>
+
+                <Stack direction="row" spacing={2} alignItems="center">
+                  <Box
+                    sx={{
+                      p: 1.25,
+                      borderRadius: 2.5,
+                      bgcolor: 'action.hover',
+                      color: 'primary.main',
+                      display: 'flex',
+                    }}
+                  >
+                    <SecurityRoundedIcon />
+                  </Box>
+                  <Box>
+                    <Typography variant="subtitle2" fontWeight={700}>
+                      Enterprise-Grade Security & Privacy
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      Full control over your data, portfolio showcase, and visibility.
+                    </Typography>
+                  </Box>
+                </Stack>
+              </Stack>
+            </Box>
+          </Grid>
+
+          {/* Right Authentication Form Container */}
+          <Grid item xs={12} sm={10} md={6} lg={5}>
+            <Outlet />
+          </Grid>
+        </Grid>
+      </Container>
+    </Box>
+  );
+};
+
+export default AuthLayout;

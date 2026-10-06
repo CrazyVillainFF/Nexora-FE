@@ -1,0 +1,472 @@
+import React, { useState, useEffect } from 'react';
+import {
+  Container,
+  Card,
+  Box,
+  Avatar,
+  Typography,
+  Stack,
+  Button,
+  Grid,
+  Chip,
+  Divider,
+  IconButton,
+  Tooltip,
+  Snackbar,
+  Alert
+} from '@mui/material';
+import { useParams, useNavigate } from 'react-router-dom';
+import VerifiedRoundedIcon from '@mui/icons-material/VerifiedRounded';
+import PlaceOutlinedIcon from '@mui/icons-material/PlaceOutlined';
+import BusinessCenterOutlinedIcon from '@mui/icons-material/BusinessCenterOutlined';
+import LanguageOutlinedIcon from '@mui/icons-material/LanguageOutlined';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import ShareOutlinedIcon from '@mui/icons-material/ShareOutlined';
+import CameraAltOutlinedIcon from '@mui/icons-material/CameraAltOutlined';
+import SchoolOutlinedIcon from '@mui/icons-material/SchoolOutlined';
+import WorkOutlineOutlinedIcon from '@mui/icons-material/WorkOutlineOutlined';
+
+import { useAuth } from '../context/AuthContext';
+import { userAPI, postAPI } from '../services/api';
+import ConnectionButton from '../components/ConnectionButton';
+import PostCard from '../components/PostCard';
+import ImageUploadModal from '../components/ImageUploadModal';
+import { ProfileHeaderSkeleton, PostSkeleton } from '../components/LoadingSkeleton';
+import EmptyState from '../components/EmptyState';
+import ErrorState from '../components/ErrorState';
+
+const ProfilePage = () => {
+  const { id } = useParams();
+  const { user: currentUser, updateUser } = useAuth();
+  const navigate = useNavigate();
+
+  const [profile, setProfile] = useState(null);
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [loadingPosts, setLoadingPosts] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Upload modals
+  const [avatarModalOpen, setAvatarModalOpen] = useState(false);
+  const [coverModalOpen, setCoverModalOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState(null);
+
+  const profileUserId = id || (currentUser ? currentUser._id : null);
+  const isOwnProfile = currentUser && profileUserId === currentUser._id;
+
+  useEffect(() => {
+    if (!profileUserId) return;
+
+    const fetchProfile = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const res = await userAPI.getUserById(profileUserId);
+        if (res.data.success) {
+          setProfile(res.data.user);
+        }
+      } catch (err) {
+        console.error('[Profile Fetch Error]', err.message);
+        setError('Unable to load user profile. The user may not exist.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const fetchUserPosts = async () => {
+      try {
+        setLoadingPosts(true);
+        const res = await postAPI.getUserPosts(profileUserId);
+        if (res.data.success) {
+          setPosts(res.data.posts || []);
+        }
+      } catch (err) {
+        console.error('[User Posts Fetch Error]', err.message);
+      } finally {
+        setLoadingPosts(false);
+      }
+    };
+
+    fetchProfile();
+    fetchUserPosts();
+  }, [profileUserId]);
+
+  const handleAvatarUpload = async (file) => {
+    const formData = new FormData();
+    formData.append('avatar', file);
+    const res = await userAPI.uploadAvatar(formData);
+    if (res.data.success) {
+      setProfile((prev) => ({ ...prev, profilePicture: res.data.profilePicture }));
+      if (isOwnProfile) {
+        updateUser({ profilePicture: res.data.profilePicture });
+      }
+      setToastMessage('Profile picture updated successfully.');
+    }
+  };
+
+  const handleCoverUpload = async (file) => {
+    const formData = new FormData();
+    formData.append('cover', file);
+    const res = await userAPI.uploadCover(formData);
+    if (res.data.success) {
+      setProfile((prev) => ({ ...prev, coverImage: res.data.coverImage }));
+      if (isOwnProfile) {
+        updateUser({ coverImage: res.data.coverImage });
+      }
+      setToastMessage('Cover banner updated successfully.');
+    }
+  };
+
+  const handleShareProfile = () => {
+    const url = window.location.href;
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(url);
+      setToastMessage('Profile link copied to clipboard!');
+    }
+  };
+
+  if (loading) {
+    return (
+      <Container maxWidth="lg">
+        <ProfileHeaderSkeleton />
+      </Container>
+    );
+  }
+
+  if (error || !profile) {
+    return (
+      <Container maxWidth="md" sx={{ py: 6 }}>
+        <ErrorState
+          title="Profile Not Found"
+          message={error || 'We could not locate this profile on NEXORA.'}
+          onRetry={() => navigate('/home')}
+        />
+      </Container>
+    );
+  }
+
+  return (
+    <Container maxWidth="lg">
+      {/* Cover and Main Profile Card */}
+      <Card sx={{ mb: 3, overflow: 'hidden', position: 'relative' }}>
+        {/* Cover Banner */}
+        <Box
+          sx={{
+            height: { xs: 140, sm: 220, md: 260 },
+            backgroundImage: profile.coverImage
+              ? `url(${profile.coverImage})`
+              : 'linear-gradient(135deg, #4F46E5 0%, #06B6D4 100%)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            position: 'relative',
+          }}
+        >
+          {isOwnProfile && (
+            <Tooltip title="Update Cover Banner">
+              <IconButton
+                onClick={() => setCoverModalOpen(true)}
+                sx={{
+                  position: 'absolute',
+                  top: 16,
+                  right: 16,
+                  bgcolor: 'rgba(0,0,0,0.55)',
+                  color: '#fff',
+                  '&:hover': { bgcolor: 'rgba(0,0,0,0.8)' },
+                }}
+              >
+                <CameraAltOutlinedIcon />
+              </IconButton>
+            </Tooltip>
+          )}
+        </Box>
+
+        {/* Profile Details Container */}
+        <Box sx={{ px: { xs: 2.5, sm: 4 }, pb: 3, pt: 0, position: 'relative' }}>
+          {/* Avatar with absolute positioning */}
+          <Box sx={{ position: 'relative', display: 'inline-block', mt: { xs: -6, sm: -8 } }}>
+            <Avatar
+              src={profile.profilePicture}
+              alt={profile.name}
+              sx={{
+                width: { xs: 96, sm: 130, md: 140 },
+                height: { xs: 96, sm: 130, md: 140 },
+                border: (theme) => `4px solid ${theme.palette.background.paper}`,
+                boxShadow: 3,
+              }}
+            >
+              {profile.name[0]}
+            </Avatar>
+            {isOwnProfile && (
+              <Tooltip title="Update Profile Picture">
+                <IconButton
+                  size="small"
+                  onClick={() => setAvatarModalOpen(true)}
+                  sx={{
+                    position: 'absolute',
+                    bottom: 4,
+                    right: 4,
+                    bgcolor: 'primary.main',
+                    color: '#fff',
+                    boxShadow: 2,
+                    '&:hover': { bgcolor: 'primary.dark' },
+                  }}
+                >
+                  <CameraAltOutlinedIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            )}
+          </Box>
+
+          {/* Action Buttons Top Right on Desktop */}
+          <Stack
+            direction="row"
+            spacing={1.5}
+            sx={{
+              position: { sm: 'absolute' },
+              top: { sm: 20 },
+              right: { sm: 32 },
+              mt: { xs: 2, sm: 0 },
+            }}
+          >
+            {isOwnProfile ? (
+              <Button
+                variant="contained"
+                color="primary"
+                startIcon={<EditOutlinedIcon />}
+                onClick={() => navigate('/profile/edit')}
+              >
+                Edit Profile
+              </Button>
+            ) : (
+              <ConnectionButton
+                userId={profile._id}
+                initialStatus={profile.connectionStatus}
+                connectionId={profile.connectionId}
+              />
+            )}
+            <Button
+              variant="outlined"
+              color="inherit"
+              startIcon={<ShareOutlinedIcon />}
+              onClick={handleShareProfile}
+            >
+              Share
+            </Button>
+          </Stack>
+
+          {/* Name & Headline */}
+          <Box sx={{ mt: 2 }}>
+            <Stack direction="row" spacing={1} alignItems="center">
+              <Typography variant="h4" fontWeight={800} letterSpacing="-0.02em">
+                {profile.name}
+              </Typography>
+              <VerifiedRoundedIcon sx={{ fontSize: 24, color: 'primary.main' }} />
+            </Stack>
+
+            <Typography variant="h6" color="text.secondary" fontWeight={500} sx={{ mt: 0.5, maxWidth: 720 }}>
+              {profile.headline || 'Professional at NEXORA'}
+            </Typography>
+
+            {/* Metadata Chips: Location, Company, Website */}
+            <Stack direction="row" spacing={2.5} flexWrap="wrap" sx={{ mt: 1.5, color: 'text.secondary' }}>
+              {profile.location && (
+                <Stack direction="row" spacing={0.75} alignItems="center">
+                  <PlaceOutlinedIcon sx={{ fontSize: 18 }} />
+                  <Typography variant="body2">{profile.location}</Typography>
+                </Stack>
+              )}
+              {profile.company && (
+                <Stack direction="row" spacing={0.75} alignItems="center">
+                  <BusinessCenterOutlinedIcon sx={{ fontSize: 18 }} />
+                  <Typography variant="body2">{profile.company}</Typography>
+                </Stack>
+              )}
+              {profile.website && (
+                <Stack direction="row" spacing={0.75} alignItems="center">
+                  <LanguageOutlinedIcon sx={{ fontSize: 18 }} />
+                  <Typography
+                    variant="body2"
+                    component="a"
+                    href={profile.website.startsWith('http') ? profile.website : `https://${profile.website}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    color="primary"
+                    sx={{ textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
+                  >
+                    {profile.website.replace(/^https?:\/\//, '')}
+                  </Typography>
+                </Stack>
+              )}
+            </Stack>
+
+            {/* Connection Counters */}
+            <Typography variant="body2" fontWeight={700} color="primary.main" sx={{ mt: 1.5 }}>
+              {profile.connections ? profile.connections.length : 0} connections • {profile.postCount || posts.length} contributions
+            </Typography>
+          </Box>
+        </Box>
+      </Card>
+
+      {/* Main Grid: Details on Left, Side Details on Right */}
+      <Grid container spacing={3}>
+        <Grid item xs={12} md={8}>
+          {/* About Section */}
+          <Card sx={{ p: 3, mb: 3 }}>
+            <Typography variant="h6" fontWeight={700} gutterBottom>
+              About & Architectural Vision
+            </Typography>
+            <Typography variant="body1" color="text.secondary" sx={{ whiteSpace: 'pre-line', lineHeight: 1.7 }}>
+              {profile.bio || 'This professional has not provided an extended bio yet.'}
+            </Typography>
+          </Card>
+
+          {/* Work Experience Section */}
+          {profile.experience && profile.experience.length > 0 && (
+            <Card sx={{ p: 3, mb: 3 }}>
+              <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 2.5 }}>
+                <WorkOutlineOutlinedIcon sx={{ color: 'primary.main' }} />
+                <Typography variant="h6" fontWeight={700}>
+                  Experience & Leadership
+                </Typography>
+              </Stack>
+              <Stack spacing={3}>
+                {profile.experience.map((exp, idx) => (
+                  <Box key={exp._id || idx}>
+                    <Typography variant="subtitle1" fontWeight={700}>
+                      {exp.title}
+                    </Typography>
+                    <Typography variant="body2" color="primary.main" fontWeight={600}>
+                      {exp.company} {exp.location ? `• ${exp.location}` : ''}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 1 }}>
+                      {exp.startDate} – {exp.current ? 'Present' : exp.endDate}
+                    </Typography>
+                    {exp.description && (
+                      <Typography variant="body2" color="text.secondary">
+                        {exp.description}
+                      </Typography>
+                    )}
+                    {idx < profile.experience.length - 1 && <Divider sx={{ mt: 2.5 }} />}
+                  </Box>
+                ))}
+              </Stack>
+            </Card>
+          )}
+
+          {/* Published Posts Stream */}
+          <Box sx={{ mb: 4 }}>
+            <Typography variant="h6" fontWeight={700} sx={{ mb: 2 }}>
+              Activity & Discussions ({posts.length})
+            </Typography>
+            {loadingPosts ? (
+              <Stack spacing={2}>
+                <PostSkeleton />
+                <PostSkeleton />
+              </Stack>
+            ) : posts.length > 0 ? (
+              <Stack spacing={0}>
+                {posts.map((post) => (
+                  <PostCard
+                    key={post._id}
+                    post={post}
+                    onPostDeleted={(pId) => setPosts((prev) => prev.filter((p) => p._id !== pId))}
+                  />
+                ))}
+              </Stack>
+            ) : (
+              <EmptyState
+                title="No posts published yet"
+                description={`${profile.name} has not published any public discussions yet.`}
+              />
+            )}
+          </Box>
+        </Grid>
+
+        {/* Sidebar Info (Skills, Education) */}
+        <Grid item xs={12} md={4}>
+          {/* Skills Card */}
+          {profile.skills && profile.skills.length > 0 && (
+            <Card sx={{ p: 3, mb: 3 }}>
+              <Typography variant="h6" fontWeight={700} gutterBottom>
+                Skills & Endorsements
+              </Typography>
+              <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap sx={{ mt: 1.5 }}>
+                {profile.skills.map((skill, index) => (
+                  <Chip
+                    key={index}
+                    label={skill}
+                    sx={{
+                      fontWeight: 600,
+                      bgcolor: 'action.hover',
+                      border: (theme) => `1px solid ${theme.palette.divider}`,
+                    }}
+                  />
+                ))}
+              </Stack>
+            </Card>
+          )}
+
+          {/* Education Card */}
+          {profile.education && profile.education.length > 0 && (
+            <Card sx={{ p: 3, mb: 3 }}>
+              <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 2 }}>
+                <SchoolOutlinedIcon sx={{ color: 'primary.main' }} />
+                <Typography variant="h6" fontWeight={700}>
+                  Education
+                </Typography>
+              </Stack>
+              <Stack spacing={2}>
+                {profile.education.map((edu, idx) => (
+                  <Box key={edu._id || idx}>
+                    <Typography variant="subtitle2" fontWeight={700}>
+                      {edu.school}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {edu.degree} {edu.fieldOfStudy ? `in ${edu.fieldOfStudy}` : ''}
+                    </Typography>
+                    {(edu.startYear || edu.endYear) && (
+                      <Typography variant="caption" color="text.secondary">
+                        {edu.startYear} – {edu.endYear}
+                      </Typography>
+                    )}
+                  </Box>
+                ))}
+              </Stack>
+            </Card>
+          )}
+        </Grid>
+      </Grid>
+
+      {/* Upload Image Modals */}
+      <ImageUploadModal
+        open={avatarModalOpen}
+        onClose={() => setAvatarModalOpen(false)}
+        onUpload={handleAvatarUpload}
+        title="Update Profile Picture"
+        helperText="Square image recommended. Max 10MB."
+      />
+
+      <ImageUploadModal
+        open={coverModalOpen}
+        onClose={() => setCoverModalOpen(false)}
+        onUpload={handleCoverUpload}
+        title="Update Cover Banner"
+        helperText="Wide 3:1 banner recommended. Max 10MB."
+      />
+
+      {/* Toast Alert */}
+      <Snackbar
+        open={Boolean(toastMessage)}
+        autoHideDuration={3500}
+        onClose={() => setToastMessage(null)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert severity="success" sx={{ borderRadius: 2 }}>
+          {toastMessage}
+        </Alert>
+      </Snackbar>
+    </Container>
+  );
+};
+
+export default ProfilePage;
