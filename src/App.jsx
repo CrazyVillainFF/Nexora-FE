@@ -48,7 +48,7 @@ function GlobalGhostCursor() {
         fadeDelayMs={650}
         fadeDurationMs={1000}
         maxDevicePixelRatio={0.5}
-        zIndex={2}
+        zIndex={0}
         mixBlendMode={mode === 'dark' ? 'screen' : 'multiply'}
       />
     </React.Suspense>

@@ -7,7 +7,7 @@ import SiteBackdrop from '../components/SiteBackdrop';
 
 const MainLayout = () => {
   return (
-    <Box sx={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column', bgcolor: 'background.default', position: 'relative', isolation: 'isolate' }}>
+    <Box sx={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column', position: 'relative', isolation: 'isolate', zIndex: 1 }}>
       <SiteBackdrop />
       <Navbar />
       <Box
