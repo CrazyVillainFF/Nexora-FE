@@ -81,10 +81,9 @@ const Navbar = () => {
           {/* Brand Logo */}
           <Stack
             direction="row"
-            alignItems="center"
             spacing={1.25}
             onClick={() => navigate(isAuthenticated ? '/home' : '/')}
-            sx={{ cursor: 'pointer', flexShrink: 0, textDecoration: 'none' }}
+            sx={{ alignItems: 'center', cursor: 'pointer', flexShrink: 0, textDecoration: 'none' }}
           >
             <Box
               sx={{
@@ -123,7 +122,7 @@ const Navbar = () => {
 
           {/* Desktop Nav Items */}
           {isAuthenticated ? (
-            <Stack direction="row" spacing={1} alignItems="center" sx={{ display: { xs: 'none', md: 'flex' } }}>
+            <Stack direction="row" spacing={1} sx={{ alignItems: 'center', display: { xs: 'none', md: 'flex' } }}>
               {navItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = location.pathname === item.path;
@@ -161,7 +160,7 @@ const Navbar = () => {
               })}
             </Stack>
           ) : (
-            <Stack direction="row" spacing={1.5} alignItems="center" sx={{ display: { xs: 'none', sm: 'flex' } }}>
+            <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center', display: { xs: 'none', sm: 'flex' } }}>
               <Button component={NavLink} to="/signin" variant="outlined" color="inherit">
                 Sign In
               </Button>

@@ -22,7 +22,7 @@ const AuthLayout = () => {
       }}
     >
       <Container maxWidth="lg">
-        <Grid container spacing={4} alignItems="center" justifyContent="center">
+        <Grid container spacing={4} sx={{ alignItems: 'center', justifyContent: 'center' }}>
           {/* Left Marketing Pillar (Hidden on mobile) */}
           <Grid size={{ xs: 12, md: 6 }} sx={{ display: { xs: 'none', md: 'block' } }}>
             <Box sx={{ pr: { md: 5 }, maxWidth: 520 }}>

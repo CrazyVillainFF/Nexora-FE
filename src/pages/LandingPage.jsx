@@ -24,10 +24,10 @@ const LandingPage = () => {
   return (
     <Box sx={{ overflowX: 'hidden' }}>
       <Container maxWidth="xl" sx={{ pt: { xs: 4, md: 7 }, pb: { xs: 7, md: 10 } }}>
-        <Grid container spacing={{ xs: 5, md: 7 }} alignItems="center">
+        <Grid container spacing={{ xs: 5, md: 7 }} sx={{ alignItems: 'center' }}>
           <Grid size={{ xs: 12, md: 6 }}>
             <Box sx={{ maxWidth: 610 }}>
-              <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 2.5, color: 'primary.main' }}>
+              <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mb: 2.5, color: 'primary.main' }}>
                 <Box sx={{ width: 26, height: 26, borderRadius: 1.25, display: 'grid', placeItems: 'center', bgcolor: 'primary.main', color: 'primary.contrastText' }}>
                   <HubRoundedIcon sx={{ fontSize: 16 }} />
                 </Box>
@@ -39,7 +39,7 @@ const LandingPage = () => {
               <Typography variant="body1" color="text.secondary" sx={{ fontSize: { xs: '1rem', md: '1.12rem' }, maxWidth: 540, mb: 4 }}>
                 Nexora brings together engineers, designers, founders, and researchers for professional relationships that make a difference.
               </Typography>
-              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} alignItems={{ xs: 'stretch', sm: 'center' }}>
+              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} sx={{ alignItems: { xs: 'stretch', sm: 'center' } }}>
                 <Button variant="contained" size="large" endIcon={<ArrowForwardRoundedIcon />} onClick={() => navigate(primaryDestination)}>
                   {isAuthenticated ? 'Open your feed' : 'Create your profile'}
                 </Button>
@@ -78,7 +78,7 @@ const LandingPage = () => {
       </Box>
 
       <Container maxWidth="lg" sx={{ py: { xs: 7, md: 11 } }}>
-        <Grid container spacing={{ xs: 5, md: 8 }} alignItems="center">
+        <Grid container spacing={{ xs: 5, md: 8 }} sx={{ alignItems: 'center' }}>
           <Grid size={{ xs: 12, md: 5 }}>
             <Typography variant="h2" sx={{ fontSize: { xs: '2rem', md: '2.65rem' }, mb: 2 }}>A calmer place to grow your professional world.</Typography>
             <Typography color="text.secondary" sx={{ mb: 3 }}>The details matter: easier discovery, clear connection requests, and a profile that gives people a reason to reach out.</Typography>
@@ -92,10 +92,10 @@ const LandingPage = () => {
                   ['Marcus Vance', 'Systems architect', 'The best introductions begin with enough context to make a useful connection.'],
                   ['Anya Sharma', 'AI researcher', 'Professional communities work when expertise is easy to find and share.'],
                 ].map(([name, role, quote]) => (
-                  <Stack key={name} direction="row" spacing={1.5} alignItems="flex-start">
+                  <Stack key={name} direction="row" spacing={1.5} sx={{ alignItems: 'flex-start' }}>
                     <Avatar sx={{ bgcolor: 'primary.main', width: 38, height: 38 }}>{name[0]}</Avatar>
                     <Box>
-                      <Stack direction="row" spacing={.5} alignItems="center"><Typography variant="subtitle2">{name}</Typography><VerifiedRoundedIcon sx={{ fontSize: 15, color: 'primary.main' }} /></Stack>
+                      <Stack direction="row" spacing={.5} sx={{ alignItems: 'center' }}><Typography variant="subtitle2">{name}</Typography><VerifiedRoundedIcon sx={{ fontSize: 15, color: 'primary.main' }} /></Stack>
                       <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: .5 }}>{role}</Typography>
                       <Typography variant="body2">“{quote}”</Typography>
                     </Box>
