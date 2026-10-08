@@ -28,7 +28,7 @@ const ReactableMark = ({ size = 38, electric = false, interactive = false, symbo
         alt=""
         draggable={false}
         sx={symbolOnly
-          ? { position: 'absolute', inset: 0, m: 'auto', zIndex: 2, width: '58%', height: '58%', objectFit: 'contain', filter: mode === 'light' ? 'brightness(0) saturate(100%)' : 'none' }
+          ? { position: 'absolute', inset: 0, m: 'auto', zIndex: 2, width: '68%', height: '68%', objectFit: 'contain', filter: mode === 'light' ? 'brightness(0) saturate(100%)' : 'none' }
           : { position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
       />
       {electric && !reduceMotion && <ElectricLogo
@@ -36,7 +36,7 @@ const ReactableMark = ({ size = 38, electric = false, interactive = false, symbo
         color={mode === 'light' ? '#176B9E' : '#F0F5F8'}
         glowColor={mode === 'light' ? '#0FAFCE' : '#AEEBFF'}
         theme={mode}
-        scale={0.54}
+        scale={0.64}
         intensity={interactive ? 0.8 : 0.35}
         glow={interactive ? 0.55 : 0.2}
         thickness={interactive ? 1.15 : 0.8}
