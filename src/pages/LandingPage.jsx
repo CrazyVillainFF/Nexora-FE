@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Button, Container, Grid, Stack, Typography, useMediaQuery } from '@mui/material';
+import { Box, Button, Container, Grid, Stack, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import ArrowForwardRoundedIcon from '@mui/icons-material/ArrowForwardRounded';
 import GroupsRoundedIcon from '@mui/icons-material/GroupsRounded';
@@ -10,8 +10,6 @@ import ParticleText from '../components/reactbits/ParticleText';
 import SpecularButton from '../components/reactbits/SpecularButton';
 import { useAuth } from '../context/AuthContext';
 import { useThemeMode } from '../theme/ThemeContext';
-
-const GhostCursor = React.lazy(() => import('../components/reactbits/GhostCursor'));
 
 const principles = [
   { icon: GroupsRoundedIcon, title: 'Built for peers', body: 'Meet people doing thoughtful work across technology and design.' },
@@ -24,8 +22,6 @@ const LandingPage = () => {
   const { isAuthenticated } = useAuth();
   const { mode } = useThemeMode();
   const dark = mode === 'dark';
-  const reduceMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
-  const coarsePointer = useMediaQuery('(pointer: coarse)');
   const primaryDestination = isAuthenticated ? '/home' : '/signup';
 
   return (
@@ -96,26 +92,6 @@ const LandingPage = () => {
           </Grid>
           <Grid size={{ xs: 12, md: 5 }}>
             <Box sx={{ minHeight: { xs: 240, sm: 320, md: 440 }, position: 'relative', display: 'grid', placeItems: 'center' }}>
-              {!reduceMotion && !coarsePointer && (
-                <React.Suspense fallback={null}>
-                  <GhostCursor
-                    color={dark ? '#71D8F0' : '#087C98'}
-                    brightness={0.8}
-                    edgeIntensity={0}
-                    trailLength={32}
-                    inertia={0.46}
-                    grainIntensity={0.025}
-                    bloomStrength={0.12}
-                    bloomRadius={0.9}
-                    bloomThreshold={0.035}
-                    fadeDelayMs={650}
-                    fadeDurationMs={1000}
-                    maxDevicePixelRatio={0.5}
-                    zIndex={0}
-                    mixBlendMode={dark ? 'screen' : 'multiply'}
-                  />
-                </React.Suspense>
-              )}
               <Box sx={{ width: { xs: 184, sm: 220, md: 260 }, height: { xs: 184, sm: 220, md: 260 }, borderRadius: '24%', position: 'relative', zIndex: 1 }}>
                 <ReactableMark size="100%" electric interactive symbolOnly />
               </Box>

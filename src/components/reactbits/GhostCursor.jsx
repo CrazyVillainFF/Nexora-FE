@@ -5,12 +5,12 @@ import * as THREE from 'three';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
-import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import './GhostCursor.css';
 
 const GhostCursor = ({
   className,
   style,
+  fixed = false,
   trailLength = 50,
   inertia = 0.5,
   grainIntensity = 0.05,
@@ -34,7 +34,6 @@ const GhostCursor = ({
   const rendererRef = useRef(null);
   const composerRef = useRef(null);
   const materialRef = useRef(null);
-  const bloomPassRef = useRef(null);
   const filmPassRef = useRef(null);
 
   const trailBufRef = useRef([]);
@@ -183,31 +182,6 @@ const GhostCursor = ({
     };
   }, [grainIntensity]);
 
-  const UnpremultiplyPass = useMemo(
-    () =>
-      new ShaderPass({
-        uniforms: { tDiffuse: { value: null } },
-        vertexShader: `
-          varying vec2 vUv;
-          void main(){
-            vUv = uv;
-            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-          }
-        `,
-        fragmentShader: `
-          uniform sampler2D tDiffuse;
-          varying vec2 vUv;
-          void main(){
-            vec4 c = texture2D(tDiffuse, vUv);
-            float coverage = clamp(max(c.r, max(c.g, c.b)), 0.0, 1.0);
-            vec3 straight = coverage > 1e-5 ? c.rgb / coverage : vec3(0.0);
-            gl_FragColor = vec4(clamp(straight, 0.0, 1.0), coverage);
-          }
-        `
-      }),
-    []
-  );
-
   function calculateScale(el) {
     const r = el.getBoundingClientRect();
     const base = 600;
@@ -223,7 +197,7 @@ const GhostCursor = ({
     let active = true;
 
     const prevParentPos = parent.style.position;
-    if (!prevParentPos || prevParentPos === 'static') {
+    if (!fixed && (!prevParentPos || prevParentPos === 'static')) {
       parent.style.position = 'relative';
     }
 
@@ -245,6 +219,9 @@ const GhostCursor = ({
     } else {
       renderer.domElement.style.removeProperty('mix-blend-mode');
     }
+    renderer.domElement.style.filter = bloomStrength > 0
+      ? `drop-shadow(0 0 ${Math.max(2, bloomRadius * 7)}px ${color})`
+      : 'none';
 
     host.appendChild(renderer.domElement);
 
@@ -289,15 +266,15 @@ const GhostCursor = ({
     const renderPass = new RenderPass(scene, camera);
     composer.addPass(renderPass);
 
-    const bloomPass = new UnrealBloomPass(new THREE.Vector2(1, 1), bloomStrength, bloomRadius, bloomThreshold);
-    bloomPassRef.current = bloomPass;
-    composer.addPass(bloomPass);
+    // Keep the renderer's native alpha intact. The previous full-screen bloom
+    // pass destroyed transparency, and estimating alpha from RGB painted a
+    // solid cyan rectangle behind the trail. A CSS drop-shadow adds glow without
+    // changing the canvas alpha channel.
 
     const filmPass = new ShaderPass(FilmGrainShader);
     filmPassRef.current = filmPass;
     composer.addPass(filmPass);
 
-    composer.addPass(UnpremultiplyPass);
 
     const resize = () => {
       if (!active) return;
@@ -329,7 +306,6 @@ const GhostCursor = ({
       const hpx = Math.max(1, Math.floor(cssH * pixelRatio));
       material.uniforms.iResolution.value.set(wpx, hpx, 1);
       material.uniforms.iScale.value = calculateScale(host);
-      bloomPass.setSize(wpx, hpx);
 
       hasValidSizeRef.current = true;
     };
@@ -340,8 +316,9 @@ const GhostCursor = ({
       resize();
     });
     resizeObsRef.current = ro;
-    ro.observe(parent);
     ro.observe(host);
+    if (!fixed) ro.observe(parent);
+    if (fixed) window.addEventListener('resize', resize, { passive: true });
 
     const start = typeof performance !== 'undefined' ? performance.now() : Date.now();
     const animate = () => {
@@ -412,7 +389,7 @@ const GhostCursor = ({
     };
 
     const onPointerMove = e => {
-      const rect = parent.getBoundingClientRect();
+      const rect = fixed ? { left: 0, top: 0, width: window.innerWidth, height: window.innerHeight } : parent.getBoundingClientRect();
       const x = THREE.MathUtils.clamp((e.clientX - rect.left) / Math.max(1, rect.width), 0, 1);
       const y = THREE.MathUtils.clamp(1 - (e.clientY - rect.top) / Math.max(1, rect.height), 0, 1);
       currentMouseRef.current.set(x, y);
@@ -430,9 +407,10 @@ const GhostCursor = ({
       ensureLoop();
     };
 
-    parent.addEventListener('pointermove', onPointerMove, { passive: true });
-    parent.addEventListener('pointerenter', onPointerEnter, { passive: true });
-    parent.addEventListener('pointerleave', onPointerLeave, { passive: true });
+    const eventTarget = fixed ? window : parent;
+    eventTarget.addEventListener('pointermove', onPointerMove, { passive: true });
+    eventTarget.addEventListener('pointerenter', onPointerEnter, { passive: true });
+    eventTarget.addEventListener('pointerleave', onPointerLeave, { passive: true });
 
     ensureLoop();
 
@@ -444,9 +422,10 @@ const GhostCursor = ({
       runningRef.current = false;
       rafRef.current = null;
 
-      parent.removeEventListener('pointermove', onPointerMove);
-      parent.removeEventListener('pointerenter', onPointerEnter);
-      parent.removeEventListener('pointerleave', onPointerLeave);
+      eventTarget.removeEventListener('pointermove', onPointerMove);
+      eventTarget.removeEventListener('pointerenter', onPointerEnter);
+      eventTarget.removeEventListener('pointerleave', onPointerLeave);
+      if (fixed) window.removeEventListener('resize', resize);
       resizeObsRef.current?.disconnect();
 
       scene.clear();
@@ -462,7 +441,7 @@ const GhostCursor = ({
       if (renderer.domElement && renderer.domElement.parentElement) {
         renderer.domElement.parentElement.removeChild(renderer.domElement);
       }
-      if (!prevParentPos || prevParentPos === 'static') {
+      if (!fixed && (!prevParentPos || prevParentPos === 'static')) {
         parent.style.position = prevParentPos;
       }
     };
@@ -512,6 +491,14 @@ const GhostCursor = ({
   useEffect(() => {
     const el = rendererRef.current?.domElement;
     if (!el) return;
+    el.style.filter = bloomStrength > 0
+      ? `drop-shadow(0 0 ${Math.max(2, bloomRadius * 7)}px ${color})`
+      : 'none';
+  }, [bloomStrength, bloomRadius, color]);
+
+  useEffect(() => {
+    const el = rendererRef.current?.domElement;
+    if (!el) return;
     if (mixBlendMode) {
       el.style.mixBlendMode = String(mixBlendMode);
     } else {
@@ -519,10 +506,9 @@ const GhostCursor = ({
     }
   }, [mixBlendMode]);
 
-  const mergedStyle = useMemo(() => ({ zIndex, ...style }), [zIndex, style]);
+  const mergedStyle = useMemo(() => ({ zIndex, ...(fixed ? { position: 'fixed', inset: 0, width: '100vw', height: '100dvh' } : {}), ...style }), [fixed, zIndex, style]);
 
   return <div ref={containerRef} className={`ghost-cursor ${className ?? ''}`} style={mergedStyle} />;
 };
 
 export default GhostCursor;
-

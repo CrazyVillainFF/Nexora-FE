@@ -1,8 +1,10 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useMediaQuery } from '@mui/material';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { NotificationProvider } from './context/NotificationContext';
 import { ThemeContextProvider } from './theme/ThemeContext';
+import { useThemeMode } from './theme/ThemeContext';
 
 import MainLayout from './layouts/MainLayout';
 import AuthLayout from './layouts/AuthLayout';
@@ -20,6 +22,38 @@ import SearchPage from './pages/SearchPage';
 import NotificationsPage from './pages/NotificationsPage';
 import SettingsPage from './pages/SettingsPage';
 import NotFoundPage from './pages/NotFoundPage';
+
+const GhostCursor = React.lazy(() => import('./components/reactbits/GhostCursor'));
+
+function GlobalGhostCursor() {
+  const reduceMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
+  const coarsePointer = useMediaQuery('(pointer: coarse)');
+  const { mode } = useThemeMode();
+
+  if (reduceMotion || coarsePointer) return null;
+
+  return (
+    <React.Suspense fallback={null}>
+      <GhostCursor
+        fixed
+        color={mode === 'dark' ? '#71D8F0' : '#087C98'}
+        brightness={0.68}
+        edgeIntensity={0}
+        trailLength={32}
+        inertia={0.46}
+        grainIntensity={0.018}
+        bloomStrength={0.12}
+        bloomRadius={0.9}
+        bloomThreshold={0.035}
+        fadeDelayMs={650}
+        fadeDurationMs={1000}
+        maxDevicePixelRatio={0.5}
+        zIndex={2}
+        mixBlendMode={mode === 'dark' ? 'screen' : 'multiply'}
+      />
+    </React.Suspense>
+  );
+}
 
 // Root index route handler
 const RootRedirect = () => {
@@ -64,6 +98,7 @@ function App() {
                 <Route path="*" element={<NotFoundPage />} />
               </Route>
             </Routes>
+            <GlobalGhostCursor />
           </BrowserRouter>
         </NotificationProvider>
       </AuthProvider>
