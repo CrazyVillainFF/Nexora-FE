@@ -89,7 +89,7 @@ const LandingPage = () => {
           </Grid>
           <Grid size={{ xs: 12, md: 5 }}>
             <Box sx={{ minHeight: { xs: 240, sm: 320, md: 440 }, position: 'relative', display: 'grid', placeItems: 'center' }}>
-              <Box sx={{ width: { xs: 184, sm: 220, md: 260 }, height: { xs: 184, sm: 220, md: 260 }, borderRadius: '24%', filter: dark ? 'drop-shadow(0 20px 42px rgba(0,0,0,.3))' : 'drop-shadow(0 20px 42px rgba(23,107,158,.24))' }}>
+              <Box sx={{ width: { xs: 184, sm: 220, md: 260 }, height: { xs: 184, sm: 220, md: 260 }, borderRadius: '24%' }}>
                 <ReactableMark size="100%" electric interactive symbolOnly />
               </Box>
             </Box>

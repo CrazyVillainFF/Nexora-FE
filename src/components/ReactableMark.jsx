@@ -19,7 +19,7 @@ const ReactableMark = ({ size = 38, electric = false, interactive = false, symbo
         placeItems: 'center',
         overflow: 'hidden',
         borderRadius: '22%',
-        background: symbolOnly ? 'linear-gradient(135deg, #17AEEB 0%, #0AD3DC 100%)' : 'transparent',
+        background: 'transparent',
       }}
     >
       <Box
@@ -28,25 +28,27 @@ const ReactableMark = ({ size = 38, electric = false, interactive = false, symbo
         alt=""
         draggable={false}
         sx={symbolOnly
-          ? { position: 'absolute', inset: 0, m: 'auto', zIndex: 2, width: '58%', height: '58%', objectFit: 'contain' }
+          ? { position: 'absolute', inset: 0, m: 'auto', zIndex: 2, width: '58%', height: '58%', objectFit: 'contain', filter: mode === 'light' ? 'brightness(0) saturate(100%)' : 'none' }
           : { position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
       />
       {electric && !reduceMotion && <ElectricLogo
         src="/reactable-network-white.png"
-        color={mode === 'light' ? '#FFFFFF' : '#F0F5F8'}
-        glowColor={mode === 'light' ? '#D4F5FF' : '#AEEBFF'}
+        color={mode === 'light' ? '#176B9E' : '#F0F5F8'}
+        glowColor={mode === 'light' ? '#0FAFCE' : '#AEEBFF'}
         theme={mode}
         scale={0.54}
-        intensity={0.35}
-        glow={0.2}
-        thickness={0.8}
-        strands={1}
-        bend={0.12}
-        crackle={0.12}
-        arcs={0}
-        flicker={0}
+        intensity={interactive ? 0.8 : 0.35}
+        glow={interactive ? 0.55 : 0.2}
+        thickness={interactive ? 1.15 : 0.8}
+        strands={interactive ? 3 : 1}
+        bend={interactive ? 0.38 : 0.12}
+        crackle={interactive ? 0.85 : 0.12}
+        arcs={interactive ? 5 : 0}
+        flicker={interactive ? 0.28 : 0}
         fill={0}
-        speed={0.3}
+        speed={interactive ? 0.85 : 0.3}
+        cursorIntensity={interactive ? 1.15 : 0.75}
+        cursorRadius={interactive ? 112 : 100}
         interactive={interactive}
         className={`reactable-mark__electric${interactive ? ' reactable-mark__electric--interactive' : ''}`}
       />}

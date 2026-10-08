@@ -1,7 +1,7 @@
 :root { font-synthesis: none; text-rendering: optimizeLegibility; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
 body { margin: 0; }
 #root { min-height: 100dvh; }
-.reactable-mark__electric { position: absolute; inset: 0; pointer-events: none; }
+.reactable-mark__electric { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
 .reactable-mark__electric--interactive { pointer-events: auto; }
 .reactable-hero-wordmark { min-height: clamp(100px, 14vw, 180px); height: clamp(100px, 14vw, 180px); }
 .specular-button {
