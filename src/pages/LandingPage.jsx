@@ -92,7 +92,7 @@ const LandingPage = () => {
               <Box sx={{ position: 'absolute', width: { xs: 245, md: 400 }, height: { xs: 245, md: 400 }, borderRadius: '50%', border: '1px solid', borderColor: 'divider', opacity: .78 }} />
               <Box sx={{ position: 'absolute', width: { xs: 190, md: 312 }, height: { xs: 190, md: 312 }, borderRadius: '50%', border: '1px solid', borderColor: 'divider', opacity: .72 }} />
               <Box sx={{ width: { xs: 128, md: 196 }, height: { xs: 128, md: 196 }, filter: dark ? 'drop-shadow(0 18px 32px rgba(0,0,0,.24))' : 'drop-shadow(0 18px 32px rgba(23,107,158,.2))' }}>
-                <ReactableMark size={196} />
+                <ReactableMark size={196} electric />
               </Box>
               <Box sx={{ position: 'absolute', top: { xs: '12%', md: '13%' }, right: { xs: '7%', md: '6%' }, px: 2, py: 1.2, border: 1, borderColor: 'divider', borderRadius: 3, bgcolor: 'background.paper', boxShadow: '0 12px 30px rgba(28,55,71,.08)' }}>
                 <Typography variant="caption" color="text.secondary" display="block">Connections with context</Typography>

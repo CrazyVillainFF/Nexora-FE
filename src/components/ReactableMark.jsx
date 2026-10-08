@@ -1,10 +1,11 @@
 import React from 'react';
-import { Box, Typography } from '@mui/material';
+import { Box, useMediaQuery } from '@mui/material';
 import ElectricLogo from './reactbits/ElectricLogo';
 import { useThemeMode } from '../theme/ThemeContext';
 
-const ReactableMark = ({ size = 38 }) => {
+const ReactableMark = ({ size = 38, electric = false }) => {
   const { mode } = useThemeMode();
+  const reduceMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
   return (
     <Box
       role="img"
@@ -17,33 +18,35 @@ const ReactableMark = ({ size = 38 }) => {
         display: 'grid',
         placeItems: 'center',
         overflow: 'hidden',
-        borderRadius: 1.25,
-        bgcolor: 'primary.main',
-        color: 'primary.contrastText',
+        borderRadius: '22%',
       }}
     >
-      <Typography component="span" sx={{ fontWeight: 800, fontSize: size * 0.72, lineHeight: 1, color: 'inherit' }}>
-        R
-      </Typography>
-      <ElectricLogo
-        src="/reactable-mark.svg"
+      <Box
+        component="img"
+        src="/reactable-icon.png"
+        alt=""
+        draggable={false}
+        sx={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+      />
+      {electric && !reduceMotion && <ElectricLogo
+        src="/reactable-network-white.png"
         color={mode === 'light' ? '#FFFFFF' : '#F0F5F8'}
-        glowColor={mode === 'light' ? '#75BDE9' : '#75BDE9'}
+        glowColor={mode === 'light' ? '#D4F5FF' : '#AEEBFF'}
         theme={mode}
-        scale={0.76}
-        intensity={0.8}
-        glow={0.55}
-        thickness={1.2}
-        strands={2}
-        bend={0.28}
-        crackle={0.35}
-        arcs={0.25}
-        flicker={0.15}
+        scale={0.54}
+        intensity={0.35}
+        glow={0.2}
+        thickness={0.8}
+        strands={1}
+        bend={0.12}
+        crackle={0.12}
+        arcs={0}
+        flicker={0}
         fill={0}
-        speed={0}
+        speed={0.3}
         interactive={false}
         className="reactable-mark__electric"
-      />
+      />}
     </Box>
   );
 };
