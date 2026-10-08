@@ -103,7 +103,7 @@ const SettingsPage = () => {
           </Typography>
 
           <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <Box
                 onClick={() => setThemeMode('light')}
                 sx={{
@@ -131,7 +131,7 @@ const SettingsPage = () => {
               </Box>
             </Grid>
 
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <Box
                 onClick={() => setThemeMode('dark')}
                 sx={{
@@ -227,7 +227,7 @@ const SettingsPage = () => {
           <Divider sx={{ mb: 2.5 }} />
 
           <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <Typography variant="caption" color="text.secondary" display="block">
                 Registered Email
               </Typography>
@@ -235,7 +235,7 @@ const SettingsPage = () => {
                 {user?.email}
               </Typography>
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <Typography variant="caption" color="text.secondary" display="block">
                 Account Status
               </Typography>

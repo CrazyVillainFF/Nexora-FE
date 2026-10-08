@@ -91,11 +91,11 @@ const Navbar = () => {
                 width: 38,
                 height: 38,
                 borderRadius: '10px',
-                background: 'linear-gradient(135deg, #4F46E5 0%, #06B6D4 100%)',
+                bgcolor: 'primary.main',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: '0 4px 12px rgba(79, 70, 229, 0.35)',
+                boxShadow: '0 4px 12px rgba(18, 59, 93, 0.22)',
                 color: '#fff',
               }}
             >
@@ -106,12 +106,7 @@ const Navbar = () => {
               fontWeight={800}
               sx={{
                 letterSpacing: '-0.03em',
-                background: (theme) =>
-                  theme.palette.mode === 'light'
-                    ? 'linear-gradient(135deg, #1E1B4B 0%, #4F46E5 100%)'
-                    : 'linear-gradient(135deg, #FFFFFF 0%, #818CF8 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
+                color: 'text.primary',
                 display: { xs: 'none', sm: 'block' },
               }}
             >

@@ -184,7 +184,7 @@ const EditProfilePage = () => {
             <Divider sx={{ mb: 2.5 }} />
 
             <Grid container spacing={2.5}>
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField
                   label="Full Name"
                   name="name"
@@ -194,7 +194,7 @@ const EditProfilePage = () => {
                   required
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField
                   label="Location"
                   name="location"
@@ -204,7 +204,7 @@ const EditProfilePage = () => {
                   onChange={handleInputChange}
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid size={{ xs: 12 }}>
                 <TextField
                   label="Professional Headline"
                   name="headline"
@@ -215,7 +215,7 @@ const EditProfilePage = () => {
                   helperText="Summarize your primary role and domain expertise."
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField
                   label="Current Job Title"
                   name="jobTitle"
@@ -225,7 +225,7 @@ const EditProfilePage = () => {
                   onChange={handleInputChange}
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField
                   label="Company / Organization"
                   name="company"
@@ -235,7 +235,7 @@ const EditProfilePage = () => {
                   onChange={handleInputChange}
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid size={{ xs: 12 }}>
                 <TextField
                   label="Portfolio or Personal Website"
                   name="website"
@@ -245,7 +245,7 @@ const EditProfilePage = () => {
                   onChange={handleInputChange}
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid size={{ xs: 12 }}>
                 <TextField
                   label="Bio & Vision"
                   name="bio"
@@ -333,7 +333,7 @@ const EditProfilePage = () => {
                 </IconButton>
 
                 <Grid container spacing={2}>
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
                       label="Title / Position"
                       size="small"
@@ -343,7 +343,7 @@ const EditProfilePage = () => {
                       required
                     />
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
                       label="Company"
                       size="small"
@@ -353,7 +353,7 @@ const EditProfilePage = () => {
                       required
                     />
                   </Grid>
-                  <Grid item xs={12} sm={4}>
+                  <Grid size={{ xs: 12, sm: 4 }}>
                     <TextField
                       label="Location"
                       size="small"
@@ -362,7 +362,7 @@ const EditProfilePage = () => {
                       onChange={(e) => handleExperienceChange(index, 'location', e.target.value)}
                     />
                   </Grid>
-                  <Grid item xs={12} sm={4}>
+                  <Grid size={{ xs: 12, sm: 4 }}>
                     <TextField
                       label="Start Date"
                       placeholder="e.g. 2021"
@@ -372,7 +372,7 @@ const EditProfilePage = () => {
                       onChange={(e) => handleExperienceChange(index, 'startDate', e.target.value)}
                     />
                   </Grid>
-                  <Grid item xs={12} sm={4}>
+                  <Grid size={{ xs: 12, sm: 4 }}>
                     <TextField
                       label="End Date"
                       placeholder="e.g. 2024 or Present"
@@ -383,7 +383,7 @@ const EditProfilePage = () => {
                       onChange={(e) => handleExperienceChange(index, 'endDate', e.target.value)}
                     />
                   </Grid>
-                  <Grid item xs={12}>
+                  <Grid size={{ xs: 12 }}>
                     <FormControlLabel
                       control={
                         <Checkbox
@@ -395,7 +395,7 @@ const EditProfilePage = () => {
                       label={<Typography variant="body2">I currently work in this role</Typography>}
                     />
                   </Grid>
-                  <Grid item xs={12}>
+                  <Grid size={{ xs: 12 }}>
                     <TextField
                       label="Description & Highlights"
                       multiline
@@ -450,7 +450,7 @@ const EditProfilePage = () => {
                 </IconButton>
 
                 <Grid container spacing={2}>
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
                       label="School / University"
                       size="small"
@@ -460,7 +460,7 @@ const EditProfilePage = () => {
                       required
                     />
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
                       label="Degree"
                       placeholder="e.g. Master of Science"
@@ -470,7 +470,7 @@ const EditProfilePage = () => {
                       onChange={(e) => handleEducationChange(index, 'degree', e.target.value)}
                     />
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
                       label="Field of Study"
                       placeholder="e.g. Computer Science"
@@ -480,7 +480,7 @@ const EditProfilePage = () => {
                       onChange={(e) => handleEducationChange(index, 'fieldOfStudy', e.target.value)}
                     />
                   </Grid>
-                  <Grid item xs={12} sm={3}>
+                  <Grid size={{ xs: 12, sm: 3 }}>
                     <TextField
                       label="Start Year"
                       size="small"
@@ -489,7 +489,7 @@ const EditProfilePage = () => {
                       onChange={(e) => handleEducationChange(index, 'startYear', e.target.value)}
                     />
                   </Grid>
-                  <Grid item xs={12} sm={3}>
+                  <Grid size={{ xs: 12, sm: 3 }}>
                     <TextField
                       label="End Year"
                       size="small"

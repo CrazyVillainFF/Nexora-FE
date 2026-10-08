@@ -146,7 +146,7 @@ const SearchPage = () => {
                   </Typography>
                   <Grid container spacing={2.5}>
                     {users.slice(0, 4).map((u) => (
-                      <Grid item xs={12} sm={6} md={3} key={u._id}>
+                      <Grid size={{ xs: 12, sm: 6, md: 3 }} key={u._id}>
                         <UserCard user={u} />
                       </Grid>
                     ))}
@@ -173,7 +173,7 @@ const SearchPage = () => {
           {tabIndex === 1 && (
             <Grid container spacing={2.5}>
               {users.map((u) => (
-                <Grid item xs={12} sm={6} md={4} lg={3} key={u._id}>
+                <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={u._id}>
                   <UserCard user={u} />
                 </Grid>
               ))}

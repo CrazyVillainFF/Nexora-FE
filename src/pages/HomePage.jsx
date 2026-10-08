@@ -81,14 +81,14 @@ const HomePage = () => {
     <Container maxWidth="xl">
       <Grid container spacing={3}>
         {/* Left Column: Profile Mini Card (Sticky on desktop) */}
-        <Grid item xs={12} md={3} sx={{ display: { xs: 'none', md: 'block' } }}>
+        <Grid size={{ xs: 12, md: 3 }} sx={{ display: { xs: 'none', md: 'block' } }}>
           <Box sx={{ position: 'sticky', top: 90 }}>
             <ProfileMiniCard />
           </Box>
         </Grid>
 
         {/* Center Column: Feed Composer & Post Stream */}
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <CreatePostCard onPostCreated={handlePostCreated} />
 
           {/* Tag Filter Pills */}
@@ -97,7 +97,7 @@ const HomePage = () => {
               {FILTER_TOPICS.map((tag) => (
                 <Chip
                   key={tag}
-                  label={tag === 'All' ? '⚡ All Updates' : `#${tag}`}
+                  label={tag === 'All' ? 'All updates' : `#${tag}`}
                   clickable
                   onClick={() => handleTagFilter(tag)}
                   color={selectedTag === tag ? 'primary' : 'default'}
@@ -158,7 +158,7 @@ const HomePage = () => {
         </Grid>
 
         {/* Right Column: Discover & Suggested Widgets */}
-        <Grid item xs={12} md={3} sx={{ display: { xs: 'none', md: 'block' } }}>
+        <Grid size={{ xs: 12, md: 3 }} sx={{ display: { xs: 'none', md: 'block' } }}>
           <Box sx={{ position: 'sticky', top: 90 }}>
             <RightWidgets />
           </Box>

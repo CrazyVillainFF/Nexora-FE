@@ -6,14 +6,14 @@ import MobileBottomNav from '../components/MobileBottomNav';
 
 const MainLayout = () => {
   return (
-    <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor: 'background.default' }}>
+    <Box sx={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column', bgcolor: 'background.default' }}>
       <Navbar />
       <Box
         component="main"
         sx={{
           flex: 1,
-          py: { xs: 2, md: 3.5 },
-          pb: { xs: 9, md: 4 }, // Add bottom padding for mobile bottom bar
+          py: { xs: 2.5, md: 4 },
+          pb: { xs: 10, md: 5 },
         }}
       >
         <Outlet />

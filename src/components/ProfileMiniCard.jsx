@@ -22,7 +22,7 @@ const ProfileMiniCard = () => {
           height: 72,
           backgroundImage: user.coverImage
             ? `url(${user.coverImage})`
-            : 'linear-gradient(135deg, #4F46E5 0%, #06B6D4 100%)',
+            : 'linear-gradient(135deg, #123B5D 0%, #176B9E 100%)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           position: 'relative'
@@ -65,7 +65,7 @@ const ProfileMiniCard = () => {
 
         {user.location && (
           <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 0.25 }}>
-            📍 {user.location}
+            {user.location}
           </Typography>
         )}
 
@@ -87,7 +87,7 @@ const ProfileMiniCard = () => {
               borderRadius: 3,
               bgcolor: 'action.selected',
               '& .MuiLinearProgress-bar': {
-                backgroundImage: 'linear-gradient(90deg, #4F46E5 0%, #06B6D4 100%)',
+                backgroundColor: 'primary.main',
               }
             }}
           />

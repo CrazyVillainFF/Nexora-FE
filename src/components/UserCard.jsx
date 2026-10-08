@@ -33,7 +33,7 @@ const UserCard = ({ user, onConnectionChanged }) => {
           height: 64,
           backgroundImage: user.coverImage
             ? `url(${user.coverImage})`
-            : 'linear-gradient(135deg, #6366F1 0%, #38BDF8 100%)',
+            : 'linear-gradient(135deg, #123B5D 0%, #176B9E 100%)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}

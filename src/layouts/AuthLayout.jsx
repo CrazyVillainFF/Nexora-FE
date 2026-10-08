@@ -24,8 +24,8 @@ const AuthLayout = () => {
       <Container maxWidth="lg">
         <Grid container spacing={4} alignItems="center" justifyContent="center">
           {/* Left Marketing Pillar (Hidden on mobile) */}
-          <Grid item xs={12} md={6} sx={{ display: { xs: 'none', md: 'block' } }}>
-            <Box sx={{ pr: { md: 4 } }}>
+          <Grid size={{ xs: 12, md: 6 }} sx={{ display: { xs: 'none', md: 'block' } }}>
+            <Box sx={{ pr: { md: 5 }, maxWidth: 520 }}>
               {/* Brand Header */}
               <Stack
                 direction="row"
@@ -38,13 +38,13 @@ const AuthLayout = () => {
                   sx={{
                     width: 44,
                     height: 44,
-                    borderRadius: 3,
-                    background: 'linear-gradient(135deg, #4F46E5 0%, #06B6D4 100%)',
+                    borderRadius: 2,
+                    bgcolor: 'primary.main',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     color: '#fff',
-                    boxShadow: '0 8px 24px rgba(79, 70, 229, 0.4)',
+                    boxShadow: '0 8px 20px rgba(18, 59, 93, 0.2)',
                   }}
                 >
                   <HubRoundedIcon sx={{ fontSize: 26 }} />
@@ -56,7 +56,7 @@ const AuthLayout = () => {
 
               <Chip
                 icon={<AutoAwesomeRoundedIcon sx={{ fontSize: '14px !important', color: 'primary.main' }} />}
-                label="The Next-Generation Executive & Engineering Network"
+                label="Professional community for people building technology"
                 size="small"
                 sx={{
                   bgcolor: 'action.hover',
@@ -67,12 +67,12 @@ const AuthLayout = () => {
                 }}
               />
 
-              <Typography variant="h3" fontWeight={800} sx={{ lineHeight: 1.15, mb: 2 }}>
-                Build high-leverage professional relationships.
+              <Typography variant="h3" fontWeight={800} sx={{ lineHeight: 1.12, mb: 2 }}>
+                Build professional relationships with more context.
               </Typography>
 
               <Typography variant="body1" color="text.secondary" sx={{ mb: 4, fontSize: '1.05rem', lineHeight: 1.6 }}>
-                Connect with leading architects, startup founders, design leaders, and engineers shaping the future of technology.
+                Connect with architects, founders, design leaders, and engineers working across technology.
               </Typography>
 
               {/* Benefit highlights */}
@@ -91,10 +91,10 @@ const AuthLayout = () => {
                   </Box>
                   <Box>
                     <Typography variant="subtitle2" fontWeight={700}>
-                      Curated Professional Ecosystem
+                      A focused professional network
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
-                      No spam, noisy algorithmic clutter, or generic clickbait.
+                      Discover people and conversations that are relevant to your work.
                     </Typography>
                   </Box>
                 </Stack>
@@ -113,10 +113,10 @@ const AuthLayout = () => {
                   </Box>
                   <Box>
                     <Typography variant="subtitle2" fontWeight={700}>
-                      Enterprise-Grade Security & Privacy
+                      Clear profile controls
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
-                      Full control over your data, portfolio showcase, and visibility.
+                      Maintain your professional presence with confidence.
                     </Typography>
                   </Box>
                 </Stack>
@@ -125,7 +125,7 @@ const AuthLayout = () => {
           </Grid>
 
           {/* Right Authentication Form Container */}
-          <Grid item xs={12} sm={10} md={6} lg={5}>
+          <Grid size={{ xs: 12, sm: 10, md: 6, lg: 5 }}>
             <Outlet />
           </Grid>
         </Grid>

@@ -175,8 +175,8 @@ const RightWidgets = () => {
         sx={{
           background: (theme) =>
             theme.palette.mode === 'light'
-              ? 'linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%)'
-              : 'linear-gradient(135deg, #3730A3 0%, #5B21B6 100%)',
+              ? '#123B5D'
+              : '#1E577D',
           color: '#FFFFFF',
           p: 2.5
         }}
@@ -199,7 +199,7 @@ const RightWidgets = () => {
             size="small"
             sx={{
               bgcolor: '#FFFFFF',
-              color: '#4F46E5',
+              color: '#123B5D',
               fontWeight: 700,
               '&:hover': { bgcolor: '#F8FAFC' }
             }}

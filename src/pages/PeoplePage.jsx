@@ -202,7 +202,7 @@ const PeoplePage = () => {
           {loading ? (
             <Grid container spacing={2.5}>
               {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-                <Grid item xs={12} sm={6} md={4} lg={3} key={i}>
+                <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={i}>
                   <UserCardSkeleton />
                 </Grid>
               ))}
@@ -212,7 +212,7 @@ const PeoplePage = () => {
           ) : users.length > 0 ? (
             <Grid container spacing={2.5}>
               {users.map((u) => (
-                <Grid item xs={12} sm={6} md={4} lg={3} key={u._id}>
+                <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={u._id}>
                   <UserCard user={u} onConnectionChanged={fetchExploreUsers} />
                 </Grid>
               ))}
@@ -238,7 +238,7 @@ const PeoplePage = () => {
           {loading ? (
             <Grid container spacing={2.5}>
               {[1, 2, 3, 4].map((i) => (
-                <Grid item xs={12} sm={6} md={4} lg={3} key={i}>
+                <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={i}>
                   <UserCardSkeleton />
                 </Grid>
               ))}
@@ -246,7 +246,7 @@ const PeoplePage = () => {
           ) : connections.length > 0 ? (
             <Grid container spacing={2.5}>
               {connections.map((u) => (
-                <Grid item xs={12} sm={6} md={4} lg={3} key={u._id}>
+                <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={u._id}>
                   <UserCard
                     user={{ ...u, connectionStatus: 'connected' }}
                     onConnectionChanged={fetchConnectionsData}
@@ -310,7 +310,7 @@ const PeoplePage = () => {
                             </Typography>
                             {sender.location && (
                               <Typography variant="caption" color="text.secondary">
-                                📍 {sender.location}
+                                {sender.location}
                               </Typography>
                             )}
                           </Box>
