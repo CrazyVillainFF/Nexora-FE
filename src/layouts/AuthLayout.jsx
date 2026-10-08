@@ -1,10 +1,11 @@
 import React from 'react';
 import { Box, Container, Grid, Typography, Stack, Chip, Card } from '@mui/material';
 import { Outlet, useNavigate } from 'react-router-dom';
-import HubRoundedIcon from '@mui/icons-material/HubRounded';
 import AutoAwesomeRoundedIcon from '@mui/icons-material/AutoAwesomeRounded';
 import SecurityRoundedIcon from '@mui/icons-material/SecurityRounded';
 import GroupsRoundedIcon from '@mui/icons-material/GroupsRounded';
+import ReactableMark from '../components/ReactableMark';
+import SiteBackdrop from '../components/SiteBackdrop';
 
 const AuthLayout = () => {
   const navigate = useNavigate();
@@ -17,15 +18,18 @@ const AuthLayout = () => {
         alignItems: 'center',
         justifyContent: 'center',
         bgcolor: 'background.default',
+        position: 'relative',
+        isolation: 'isolate',
         py: { xs: 3, md: 6 },
         px: { xs: 2, sm: 3 },
       }}
     >
+      <SiteBackdrop />
       <Container maxWidth="lg">
         <Grid container spacing={4} sx={{ alignItems: 'center', justifyContent: 'center' }}>
           {/* Left Marketing Pillar (Hidden on mobile) */}
           <Grid size={{ xs: 12, md: 6 }} sx={{ display: { xs: 'none', md: 'block' } }}>
-            <Box sx={{ pr: { md: 5 }, maxWidth: 520 }}>
+            <Box sx={{ pr: { md: 5 }, maxWidth: 520, position: 'relative', zIndex: 1 }}>
               {/* Brand Header */}
               <Stack
                 direction="row"
@@ -34,23 +38,9 @@ const AuthLayout = () => {
                 onClick={() => navigate('/')}
                 sx={{ cursor: 'pointer', mb: 3 }}
               >
-                <Box
-                  sx={{
-                    width: 44,
-                    height: 44,
-                    borderRadius: 2,
-                    bgcolor: 'primary.main',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: '#fff',
-                    boxShadow: '0 8px 20px rgba(18, 59, 93, 0.2)',
-                  }}
-                >
-                  <HubRoundedIcon sx={{ fontSize: 26 }} />
-                </Box>
+                <ReactableMark size={44} />
                 <Typography variant="h4" fontWeight={800} letterSpacing="-0.03em">
-                  NEXORA
+                  Reactable
                 </Typography>
               </Stack>
 
@@ -125,7 +115,7 @@ const AuthLayout = () => {
           </Grid>
 
           {/* Right Authentication Form Container */}
-          <Grid size={{ xs: 12, sm: 10, md: 6, lg: 5 }}>
+          <Grid size={{ xs: 12, sm: 10, md: 6, lg: 5 }} sx={{ position: 'relative', zIndex: 1 }}>
             <Outlet />
           </Grid>
         </Grid>

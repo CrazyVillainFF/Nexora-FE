@@ -1,0 +1,11 @@
+.site-backdrop {
+  position: fixed !important;
+  inset: 0;
+  z-index: 0;
+  height: 100dvh !important;
+  opacity: 0.3;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-backdrop { opacity: 0.18; }
+}

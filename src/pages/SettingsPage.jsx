@@ -99,7 +99,7 @@ const SettingsPage = () => {
             </Typography>
           </Stack>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2.5 }}>
-            Select your preferred color mode for the NEXORA interface.
+            Select your preferred color mode for the Reactable interface.
           </Typography>
 
           <Grid container spacing={2}>

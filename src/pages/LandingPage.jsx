@@ -1,75 +1,121 @@
 import React from 'react';
-import { Box, Button, Container, Grid, Stack, Typography, Card, CardContent, Avatar, Divider } from '@mui/material';
+import { Box, Button, Container, Grid, Stack, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import ArrowForwardRoundedIcon from '@mui/icons-material/ArrowForwardRounded';
-import HubRoundedIcon from '@mui/icons-material/HubRounded';
-import VerifiedRoundedIcon from '@mui/icons-material/VerifiedRounded';
 import GroupsRoundedIcon from '@mui/icons-material/GroupsRounded';
-import SecurityRoundedIcon from '@mui/icons-material/SecurityRounded';
 import InsightsRoundedIcon from '@mui/icons-material/InsightsRounded';
-import heroImage from '../assets/hero.png';
+import SecurityRoundedIcon from '@mui/icons-material/SecurityRounded';
+import ReactableMark from '../components/ReactableMark';
+import ParticleText from '../components/reactbits/ParticleText';
+import SpecularButton from '../components/reactbits/SpecularButton';
 import { useAuth } from '../context/AuthContext';
+import { useThemeMode } from '../theme/ThemeContext';
 
 const principles = [
-  { icon: GroupsRoundedIcon, title: 'Built for peers', body: 'A focused place to meet people doing thoughtful work in technology.' },
-  { icon: InsightsRoundedIcon, title: 'A useful feed', body: 'Conversations, expertise, and professional context without unnecessary noise.' },
-  { icon: SecurityRoundedIcon, title: 'Your profile, your control', body: 'Present your work and manage your presence with clear privacy boundaries.' },
+  { icon: GroupsRoundedIcon, title: 'Built for peers', body: 'Meet people doing thoughtful work across technology and design.' },
+  { icon: InsightsRoundedIcon, title: 'A useful feed', body: 'Find conversations and expertise without the unnecessary noise.' },
+  { icon: SecurityRoundedIcon, title: 'Your profile, your control', body: 'Share your work and manage your professional presence with confidence.' },
 ];
 
 const LandingPage = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+  const { mode } = useThemeMode();
+  const dark = mode === 'dark';
   const primaryDestination = isAuthenticated ? '/home' : '/signup';
 
   return (
     <Box sx={{ overflowX: 'hidden' }}>
-      <Container maxWidth="xl" sx={{ pt: { xs: 4, md: 7 }, pb: { xs: 7, md: 10 } }}>
-        <Grid container spacing={{ xs: 5, md: 7 }} sx={{ alignItems: 'center' }}>
-          <Grid size={{ xs: 12, md: 6 }}>
-            <Box sx={{ maxWidth: 610 }}>
-              <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mb: 2.5, color: 'primary.main' }}>
-                <Box sx={{ width: 26, height: 26, borderRadius: 1.25, display: 'grid', placeItems: 'center', bgcolor: 'primary.main', color: 'primary.contrastText' }}>
-                  <HubRoundedIcon sx={{ fontSize: 16 }} />
-                </Box>
-                <Typography variant="subtitle2" sx={{ letterSpacing: '.08em', fontSize: 12 }}>NEXORA PROFESSIONAL NETWORK</Typography>
+      <Container maxWidth="xl" sx={{ pt: { xs: 3, md: 7 }, pb: { xs: 7, md: 10 }, position: 'relative' }}>
+        <Grid container spacing={{ xs: 2, md: 6 }} sx={{ alignItems: 'center', minHeight: { md: 'min(690px, calc(100dvh - 100px))' } }}>
+          <Grid size={{ xs: 12, md: 7 }}>
+            <Box sx={{ maxWidth: 720 }}>
+              <Stack direction="row" spacing={1.25} sx={{ alignItems: 'center', mb: 2, color: 'primary.main' }}>
+                <ReactableMark size={32} />
+                <Typography variant="overline" sx={{ letterSpacing: '.14em', fontWeight: 700 }}>A network for what’s next</Typography>
               </Stack>
-              <Typography variant="h1" sx={{ fontSize: { xs: '2.9rem', sm: '3.65rem', lg: '4.25rem' }, mb: 2.5 }}>
-                Build the network behind your best work.
+              <Box component="h1" sx={{ p: 0, m: 0, font: 'inherit', lineHeight: 1 }}>
+                <ParticleText
+                  text="Reactable"
+                  color={dark ? '#E8F2F8' : '#152B3A'}
+                  highlightColor={dark ? '#75BDE9' : '#176B9E'}
+                  particleSize={2.2}
+                  density={3.2}
+                  scatter={80}
+                  gatherDuration={1100}
+                  stagger={180}
+                  pointerRepel={12}
+                  repelRadius={78}
+                  idleDrift={0.12}
+                  trigger="mount"
+                  fontSize="clamp(3.5rem, 10vw, 7.4rem)"
+                  fontWeight={780}
+                  glow={false}
+                  className="reactable-hero-wordmark"
+                />
+              </Box>
+              <Typography variant="h2" sx={{ fontSize: { xs: '1.75rem', md: '2.25rem' }, lineHeight: 1.18, maxWidth: 650, mt: 1.5, mb: 2.25 }}>
+                Make the right connections. Do more meaningful work.
               </Typography>
-              <Typography variant="body1" color="text.secondary" sx={{ fontSize: { xs: '1rem', md: '1.12rem' }, maxWidth: 540, mb: 4 }}>
-                Nexora brings together engineers, designers, founders, and researchers for professional relationships that make a difference.
+              <Typography color="text.secondary" sx={{ fontSize: { xs: '1rem', md: '1.12rem' }, lineHeight: 1.75, maxWidth: 570, mb: 3.5 }}>
+                A professional network for engineers, designers, founders, and researchers to share what they’re building and find the people who can move it forward.
               </Typography>
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} sx={{ alignItems: { xs: 'stretch', sm: 'center' } }}>
-                <Button variant="contained" size="large" endIcon={<ArrowForwardRoundedIcon />} onClick={() => navigate(primaryDestination)}>
-                  {isAuthenticated ? 'Open your feed' : 'Create your profile'}
+                <SpecularButton
+                  size="md"
+                  radius={12}
+                  tint={dark ? '#1B3544' : '#176B9E'}
+                  tintOpacity={1}
+                  textColor="#FFFFFF"
+                  lineColor={dark ? '#C4E8FA' : '#D9F1FF'}
+                  baseColor={dark ? '#37647C' : '#0D527D'}
+                  intensity={0.5}
+                  speed={0}
+                  followMouse={false}
+                  autoAnimate
+                  onClick={() => navigate(primaryDestination)}
+                >
+                  {isAuthenticated ? 'Open your feed' : 'Get started'}
+                  <ArrowForwardRoundedIcon sx={{ ml: 1, fontSize: 19 }} />
+                </SpecularButton>
+                <Button variant="outlined" size="large" onClick={() => navigate(isAuthenticated ? '/people' : '/signin')} sx={{ minHeight: 48, borderRadius: 3 }}>
+                  {isAuthenticated ? 'Explore the network' : 'Sign in'}
                 </Button>
-                <Button variant="outlined" size="large" onClick={() => navigate('/signin')}>Sign in</Button>
               </Stack>
+              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 2.25 }}>
+                Thoughtful introductions start with the right context.
+              </Typography>
             </Box>
           </Grid>
-          <Grid size={{ xs: 12, md: 6 }}>
-            <Box sx={{ position: 'relative', maxWidth: 590, ml: { md: 'auto' } }}>
-              <Box component="img" src={heroImage} alt="Professionals collaborating at a shared workspace" sx={{ display: 'block', width: '100%', minHeight: { xs: 280, md: 430 }, objectFit: 'cover', borderRadius: 2, filter: 'saturate(.72) contrast(1.04)' }} />
-              <Card sx={{ position: 'absolute', left: { xs: 16, md: -32 }, bottom: { xs: 16, md: 28 }, width: { xs: 'calc(100% - 32px)', sm: 310 }, bgcolor: (theme) => theme.palette.mode === 'light' ? 'rgba(255,255,255,.96)' : 'rgba(23,33,43,.96)', backdropFilter: 'blur(12px)', boxShadow: 3 }}>
-                <CardContent sx={{ p: '16px !important' }}>
-                  <Typography variant="body2" fontWeight={700} sx={{ mb: .5 }}>Professional context, not performance.</Typography>
-                  <Typography variant="caption" color="text.secondary">A clear profile and relevant conversations make introductions more useful.</Typography>
-                </CardContent>
-              </Card>
+          <Grid size={{ xs: 12, md: 5 }}>
+            <Box sx={{ minHeight: { xs: 230, sm: 320, md: 440 }, position: 'relative', display: 'grid', placeItems: 'center' }}>
+              <Box sx={{ position: 'absolute', width: { xs: 245, md: 400 }, height: { xs: 245, md: 400 }, borderRadius: '50%', border: '1px solid', borderColor: 'divider', opacity: .78 }} />
+              <Box sx={{ position: 'absolute', width: { xs: 190, md: 312 }, height: { xs: 190, md: 312 }, borderRadius: '50%', border: '1px solid', borderColor: 'divider', opacity: .72 }} />
+              <Box sx={{ width: { xs: 128, md: 196 }, height: { xs: 128, md: 196 }, filter: dark ? 'drop-shadow(0 18px 32px rgba(0,0,0,.24))' : 'drop-shadow(0 18px 32px rgba(23,107,158,.2))' }}>
+                <ReactableMark size={196} />
+              </Box>
+              <Box sx={{ position: 'absolute', top: { xs: '12%', md: '13%' }, right: { xs: '7%', md: '6%' }, px: 2, py: 1.2, border: 1, borderColor: 'divider', borderRadius: 3, bgcolor: 'background.paper', boxShadow: '0 12px 30px rgba(28,55,71,.08)' }}>
+                <Typography variant="caption" color="text.secondary" display="block">Connections with context</Typography>
+                <Typography variant="subtitle2" fontWeight={700}>People behind the work</Typography>
+              </Box>
+              <Box sx={{ position: 'absolute', bottom: { xs: '10%', md: '12%' }, left: { xs: '3%', md: '1%' }, px: 2, py: 1.2, border: 1, borderColor: 'divider', borderRadius: 3, bgcolor: 'background.paper', boxShadow: '0 12px 30px rgba(28,55,71,.08)' }}>
+                <Typography variant="caption" color="text.secondary" display="block">A better professional network</Typography>
+                <Typography variant="subtitle2" fontWeight={700}>Built around your next idea</Typography>
+              </Box>
             </Box>
           </Grid>
         </Grid>
       </Container>
 
-      <Box sx={{ borderTop: 1, borderBottom: 1, borderColor: 'divider', bgcolor: 'background.paper' }}>
-        <Container maxWidth="xl" sx={{ py: { xs: 5, md: 7 } }}>
+      <Box sx={{ borderTop: 1, borderBottom: 1, borderColor: 'divider', bgcolor: 'background.paper', position: 'relative' }}>
+        <Container maxWidth="xl" sx={{ py: { xs: 4, md: 5 } }}>
           <Grid container spacing={{ xs: 3, md: 0 }}>
             {principles.map(({ icon: Icon, title, body }, index) => (
               <Grid size={{ xs: 12, md: 4 }} key={title}>
                 <Box sx={{ px: { md: index === 0 ? 0 : 4 }, borderLeft: { md: index === 0 ? 0 : 1 }, borderColor: 'divider' }}>
-                  <Icon sx={{ color: 'primary.main', mb: 1.5 }} />
+                  <Icon sx={{ color: 'primary.main', mb: 1.25 }} />
                   <Typography variant="h6" sx={{ mb: .75 }}>{title}</Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 290 }}>{body}</Typography>
+                  <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 310, lineHeight: 1.65 }}>{body}</Typography>
                 </Box>
               </Grid>
             ))}
@@ -77,43 +123,31 @@ const LandingPage = () => {
         </Container>
       </Box>
 
-      <Container maxWidth="lg" sx={{ py: { xs: 7, md: 11 } }}>
-        <Grid container spacing={{ xs: 5, md: 8 }} sx={{ alignItems: 'center' }}>
-          <Grid size={{ xs: 12, md: 5 }}>
-            <Typography variant="h2" sx={{ fontSize: { xs: '2rem', md: '2.65rem' }, mb: 2 }}>A calmer place to grow your professional world.</Typography>
-            <Typography color="text.secondary" sx={{ mb: 3 }}>The details matter: easier discovery, clear connection requests, and a profile that gives people a reason to reach out.</Typography>
-            <Button variant="text" endIcon={<ArrowForwardRoundedIcon />} onClick={() => navigate('/people')}>Explore the network</Button>
+      <Container maxWidth="xl" sx={{ py: { xs: 6, md: 9 } }}>
+        <Grid container spacing={4} sx={{ alignItems: 'center' }}>
+          <Grid size={{ xs: 12, md: 6 }}>
+            <Typography variant="overline" color="primary.main" fontWeight={700} letterSpacing=".12em">Make discovery matter</Typography>
+            <Typography variant="h2" sx={{ fontSize: { xs: '2rem', md: '3rem' }, lineHeight: 1.14, maxWidth: 570, my: 1.5 }}>A clearer path from good work to great collaborators.</Typography>
+            <Typography color="text.secondary" sx={{ maxWidth: 520, lineHeight: 1.8 }}>Share your experience, discover people with complementary expertise, and make introductions that lead somewhere.</Typography>
           </Grid>
-          <Grid size={{ xs: 12, md: 7 }}>
-            <Card sx={{ p: { xs: 2, sm: 3 }, bgcolor: 'background.subtle' }}>
-              <Stack spacing={2.25} divider={<Divider flexItem />}>
-                {[
-                  ['Elena Rostova', 'Product design leader', 'A thoughtful network should help people find the right conversation faster.'],
-                  ['Marcus Vance', 'Systems architect', 'The best introductions begin with enough context to make a useful connection.'],
-                  ['Anya Sharma', 'AI researcher', 'Professional communities work when expertise is easy to find and share.'],
-                ].map(([name, role, quote]) => (
-                  <Stack key={name} direction="row" spacing={1.5} sx={{ alignItems: 'flex-start' }}>
-                    <Avatar sx={{ bgcolor: 'primary.main', width: 38, height: 38 }}>{name[0]}</Avatar>
-                    <Box>
-                      <Stack direction="row" spacing={.5} sx={{ alignItems: 'center' }}><Typography variant="subtitle2">{name}</Typography><VerifiedRoundedIcon sx={{ fontSize: 15, color: 'primary.main' }} /></Stack>
-                      <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: .5 }}>{role}</Typography>
-                      <Typography variant="body2">“{quote}”</Typography>
-                    </Box>
-                  </Stack>
-                ))}
-              </Stack>
-            </Card>
+          <Grid size={{ xs: 12, md: 6 }}>
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 1.5 }}>
+              {[
+                ['01', 'Show your work', 'Give people a clear view of what you do and what you care about.'],
+                ['02', 'Find your people', 'Search a community shaped by real skills and shared interests.'],
+                ['03', 'Start a conversation', 'Turn the right introduction into a useful exchange.'],
+                ['04', 'Keep growing', 'Build a network that develops with your work.'],
+              ].map(([number, title, copy]) => (
+                <Box key={number} sx={{ p: 2.25, border: 1, borderColor: 'divider', borderRadius: 3, bgcolor: 'background.paper' }}>
+                  <Typography variant="overline" color="primary.main" fontWeight={700}>{number}</Typography>
+                  <Typography variant="subtitle1" fontWeight={700} sx={{ mt: .5, mb: .6 }}>{title}</Typography>
+                  <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.65 }}>{copy}</Typography>
+                </Box>
+              ))}
+            </Box>
           </Grid>
         </Grid>
       </Container>
-
-      <Box sx={{ bgcolor: 'primary.main', color: 'primary.contrastText' }}>
-        <Container maxWidth="lg" sx={{ py: { xs: 6, md: 8 }, textAlign: 'center' }}>
-          <Typography variant="h2" sx={{ color: 'inherit', fontSize: { xs: '2rem', md: '2.75rem' }, mb: 1.5 }}>Make your next connection count.</Typography>
-          <Typography sx={{ color: 'rgba(255,255,255,.78)', maxWidth: 510, mx: 'auto', mb: 3 }}>Set up your professional profile and take part in the conversations that move your work forward.</Typography>
-          <Button variant="contained" size="large" onClick={() => navigate(primaryDestination)} sx={{ bgcolor: '#FFFFFF', color: 'primary.dark', '&:hover': { bgcolor: '#E8F2F8' } }}>{isAuthenticated ? 'Open your feed' : 'Get started'}</Button>
-        </Container>
-      </Box>
     </Box>
   );
 };

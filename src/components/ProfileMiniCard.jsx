@@ -60,7 +60,7 @@ const ProfileMiniCard = () => {
         </Stack>
 
         <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.825rem', mt: 0.5 }} noWrap>
-          {user.headline || 'Professional at NEXORA'}
+          {user.headline || 'Professional at Reactable'}
         </Typography>
 
         {user.location && (

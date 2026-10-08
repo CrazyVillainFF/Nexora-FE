@@ -71,7 +71,7 @@ const SignInPage = () => {
       <CardContent sx={{ p: '0 !important' }}>
         <Box sx={{ mb: 3 }}>
           <Typography variant="h5" fontWeight={800} gutterBottom>
-            Welcome back to NEXORA
+            Welcome back to Reactable
           </Typography>
           <Typography variant="body2" color="text.secondary">
             Sign in to access your professional feed and network.
@@ -163,7 +163,7 @@ const SignInPage = () => {
 
         <Divider sx={{ my: 3 }}>
           <Typography variant="caption" color="text.secondary">
-            NEW TO NEXORA?
+            NEW TO REACTABLE?
           </Typography>
         </Divider>
 

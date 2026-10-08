@@ -1,3 +1,18 @@
 :root { font-synthesis: none; text-rendering: optimizeLegibility; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
 body { margin: 0; }
 #root { min-height: 100dvh; }
+.reactable-mark__electric { position: absolute; inset: 0; pointer-events: none; }
+.reactable-hero-wordmark { min-height: clamp(100px, 14vw, 180px); height: clamp(100px, 14vw, 180px); }
+.specular-button {
+  min-height: 48px;
+  padding: 0 24px;
+  border: 1px solid rgba(23, 76, 105, .16);
+  background: #176B9E !important;
+  box-shadow: 0 8px 20px rgba(23, 107, 158, .17);
+}
+.specular-button:hover { background: #12577F !important; }
+.specular-button:focus-visible { outline: 3px solid #4B8EAD; outline-offset: 3px; }
+.specular-button__fx { opacity: .5; }
+@media (prefers-reduced-motion: reduce) {
+  .specular-button, .specular-button:active { transition: none; transform: none; }
+}

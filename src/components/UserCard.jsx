@@ -80,7 +80,7 @@ const UserCard = ({ user, onConnectionChanged }) => {
             mb: 1
           }}
         >
-          {user.headline || user.jobTitle || 'Professional at NEXORA'}
+          {user.headline || user.jobTitle || 'Professional at Reactable'}
         </Typography>
 
         {/* Company & Location Tags */}

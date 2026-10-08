@@ -173,7 +173,7 @@ const SearchBar = ({ placeholder = 'Search professionals, skills, insights...', 
                           }
                           secondary={
                             <Typography variant="caption" color="text.secondary" noWrap display="block">
-                              {u.headline || u.jobTitle || 'Professional at NEXORA'}
+                              {u.headline || u.jobTitle || 'Professional at Reactable'}
                             </Typography>
                           }
                         />

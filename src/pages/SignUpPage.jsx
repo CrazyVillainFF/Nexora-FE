@@ -71,7 +71,7 @@ const SignUpPage = () => {
         confirmPassword,
         jobTitle: jobTitle.trim(),
         company: company.trim(),
-        headline: jobTitle && company ? `${jobTitle} at ${company}` : jobTitle || 'Professional at NEXORA'
+        headline: jobTitle && company ? `${jobTitle} at ${company}` : jobTitle || 'Professional at Reactable'
       });
       navigate('/home');
     } catch (err) {
@@ -86,7 +86,7 @@ const SignUpPage = () => {
       <CardContent sx={{ p: '0 !important' }}>
         <Box sx={{ mb: 3 }}>
           <Typography variant="h5" fontWeight={800} gutterBottom>
-            Join the NEXORA Network
+            Join the Reactable network
           </Typography>
           <Typography variant="body2" color="text.secondary">
             Connect with leading founders, architects, and designers worldwide.

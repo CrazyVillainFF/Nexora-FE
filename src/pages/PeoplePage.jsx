@@ -306,7 +306,7 @@ const PeoplePage = () => {
                               {sender.name}
                             </Typography>
                             <Typography variant="body2" color="text.secondary">
-                              {sender.headline || sender.company || 'Professional at NEXORA'}
+                              {sender.headline || sender.company || 'Professional at Reactable'}
                             </Typography>
                             {sender.location && (
                               <Typography variant="caption" color="text.secondary">

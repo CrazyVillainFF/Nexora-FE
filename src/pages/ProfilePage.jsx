@@ -138,7 +138,7 @@ const ProfilePage = () => {
       <Container maxWidth="md" sx={{ py: 6 }}>
         <ErrorState
           title="Profile Not Found"
-          message={error || 'We could not locate this profile on NEXORA.'}
+          message={error || 'We could not locate this profile on Reactable.'}
           onRetry={() => navigate('/home')}
         />
       </Container>
@@ -264,7 +264,7 @@ const ProfilePage = () => {
             </Stack>
 
             <Typography variant="h6" color="text.secondary" fontWeight={500} sx={{ mt: 0.5, maxWidth: 720 }}>
-              {profile.headline || 'Professional at NEXORA'}
+              {profile.headline || 'Professional at Reactable'}
             </Typography>
 
             {/* Metadata Chips: Location, Company, Website */}

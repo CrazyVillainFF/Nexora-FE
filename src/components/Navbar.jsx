@@ -25,12 +25,12 @@ import PersonOutlineRoundedIcon from '@mui/icons-material/PersonOutlineRounded';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
-import HubRoundedIcon from '@mui/icons-material/HubRounded';
 
 import { useAuth } from '../context/AuthContext';
 import { useNotifications } from '../context/NotificationContext';
 import { useThemeMode } from '../theme/ThemeContext';
 import SearchBar from './SearchBar';
+import ReactableMark from './ReactableMark';
 
 const Navbar = () => {
   const { user, isAuthenticated, logout } = useAuth();
@@ -85,21 +85,7 @@ const Navbar = () => {
             onClick={() => navigate(isAuthenticated ? '/home' : '/')}
             sx={{ alignItems: 'center', cursor: 'pointer', flexShrink: 0, textDecoration: 'none' }}
           >
-            <Box
-              sx={{
-                width: 38,
-                height: 38,
-                borderRadius: '10px',
-                bgcolor: 'primary.main',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxShadow: '0 4px 12px rgba(18, 59, 93, 0.22)',
-                color: '#fff',
-              }}
-            >
-              <HubRoundedIcon sx={{ fontSize: 22 }} />
-            </Box>
+            <ReactableMark size={38} />
             <Typography
               variant="h5"
               fontWeight={800}
@@ -109,7 +95,7 @@ const Navbar = () => {
                 display: { xs: 'none', sm: 'block' },
               }}
             >
-              NEXORA
+              Reactable
             </Typography>
           </Stack>
 
@@ -165,7 +151,7 @@ const Navbar = () => {
                 Sign In
               </Button>
               <Button component={NavLink} to="/signup" variant="contained" color="primary">
-                Join Network
+                Get started
               </Button>
             </Stack>
           )}

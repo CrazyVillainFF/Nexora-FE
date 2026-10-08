@@ -1,0 +1,32 @@
+import React from 'react';
+import AeroShards from './reactbits/AeroShards';
+import { useThemeMode } from '../theme/ThemeContext';
+import './reactbits/SiteBackdrop.css';
+
+const SiteBackdrop = () => {
+  const { mode } = useThemeMode();
+  const dark = mode === 'dark';
+
+  return (
+    <AeroShards
+      className="site-backdrop"
+      backgroundColor={dark ? '#101820' : '#F7FAFC'}
+      shardColor={dark ? '#35566A' : '#B8D2E0'}
+      accentColor={dark ? '#75BDE9' : '#4B8EAD'}
+      placement="right"
+      flow="stream"
+      material="pearl"
+      detail="bold"
+      quality="low"
+      interaction="none"
+      density={0.6}
+      speed={0.22}
+      spin={0.12}
+      glow={0.14}
+      spread={0.72}
+      paused={false}
+    />
+  );
+};
+
+export default SiteBackdrop;
