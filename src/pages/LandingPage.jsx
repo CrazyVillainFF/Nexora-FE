@@ -36,7 +36,7 @@ const LandingPage = () => {
               </Stack>
               <Box component="h1" sx={{ p: 0, m: 0, font: 'inherit', lineHeight: 1 }}>
                 <ParticleText
-                  text="Reactable"
+                  text="Nexora"
                   color={dark ? '#E8F2F8' : '#152B3A'}
                   highlightColor={dark ? '#75BDE9' : '#176B9E'}
                   particleSize={2.2}
