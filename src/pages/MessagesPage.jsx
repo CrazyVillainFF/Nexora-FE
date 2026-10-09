@@ -47,6 +47,8 @@ const MessagesPage = () => {
   const [search, setSearch] = useState('');
   const bottomRef = useRef(null);
   const searchRef = useRef(null);
+  const composerInputRef = useRef(null);
+  const legacySyncsRef = useRef(new Set());
   const selectedConversationId = useRef(null);
   const messageRequestId = useRef(0);
   const openRequestId = useRef(0);
@@ -56,6 +58,7 @@ const MessagesPage = () => {
     const requestId = ++messageRequestId.current;
     try {
       const response = await messageAPI.getMessages(conversationId);
+      const legacyToSync = [];
       const decrypted = await Promise.all((response.data.messages || []).map(async (message) => {
         try {
           const senderSigningKey = message.sender.toString() === userId.toString()
@@ -63,7 +66,9 @@ const MessagesPage = () => {
             : peerSigningPublicKey;
           if (typeof message.text === 'string') return { ...message, decryptError: false };
           if (!key) return { ...message, text: 'This older encrypted message is only available on the device where it was created.', decryptError: true };
-          return { ...message, text: await decryptMessage(message, userId, key, senderSigningKey), decryptError: false };
+          const text = await decryptMessage(message, userId, key, senderSigningKey);
+          legacyToSync.push({ id: message._id, text });
+          return { ...message, text, decryptError: false };
         } catch {
           return { ...message, text: 'Unable to decrypt on this device.', decryptError: true };
         }
@@ -71,6 +76,13 @@ const MessagesPage = () => {
       if (requestId !== messageRequestId.current || selectedConversationId.current !== conversationId) return;
       setMessages(decrypted);
       setLoadingMessages(false);
+      const unsynced = legacyToSync.filter(({ id }) => !legacySyncsRef.current.has(String(id)));
+      if (unsynced.length) {
+        unsynced.forEach(({ id }) => legacySyncsRef.current.add(String(id)));
+        messageAPI.syncLegacyMessages(conversationId, unsynced).catch(() => {
+          unsynced.forEach(({ id }) => legacySyncsRef.current.delete(String(id)));
+        });
+      }
     } catch (requestError) {
       if (requestId !== messageRequestId.current || selectedConversationId.current !== conversationId) return;
       setError(requestError.message || 'Unable to load this conversation.');
@@ -169,11 +181,11 @@ const MessagesPage = () => {
 
   const sendMessage = async (event) => {
     event.preventDefault();
-    if (!draft.trim() || !active || sending) return;
+    const text = (composerInputRef.current?.value || draft).trim();
+    if (!text || !active || sending) return;
     try {
       setSending(true);
       setError('');
-      const text = draft.trim();
       const sentAt = new Date().toISOString();
       await messageAPI.sendMessage(active._id, { text });
       setDraft('');
@@ -369,12 +381,15 @@ const MessagesPage = () => {
                 <Box component="form" onSubmit={sendMessage} sx={{ p: { xs: 1, sm: 1.5 }, pb: 'max(12px, env(safe-area-inset-bottom))', borderTop: 1, borderColor: 'divider', display: 'flex', gap: 1, alignItems: 'flex-end', bgcolor: 'background.paper' }}>
                   <TextField
                     fullWidth multiline maxRows={4} size="small" label="Message" value={draft}
+                    inputRef={composerInputRef}
                     onChange={(event) => setDraft(event.target.value.slice(0, 5000))}
+                    onInput={(event) => setDraft(event.currentTarget.value.slice(0, 5000))}
+                    onFocus={(event) => setDraft(event.currentTarget.value.slice(0, 5000))}
                     onKeyDown={handleComposerKeyDown}
-                    inputProps={{ maxLength: 5000 }}
+                    inputProps={{ maxLength: 5000, name: 'message' }}
                     placeholder="Write a message..."
                   />
-                  <Button type="submit" variant="contained" aria-label="Send message" disabled={!draft.trim() || sending} sx={{ minWidth: 48, width: 48, height: 40, px: 0 }}>
+                  <Button type="submit" variant="contained" aria-label="Send message" disabled={sending} sx={{ minWidth: 48, width: 48, height: 40, px: 0 }}>
                     {sending ? <CircularProgress size={18} color="inherit" /> : <SendRoundedIcon />}
                   </Button>
                 </Box>

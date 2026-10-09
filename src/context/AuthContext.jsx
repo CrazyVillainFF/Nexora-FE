@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { authAPI, messageAPI } from '../services/api';
-import { ensureDeviceKeyPair } from '../utils/e2ee';
+import { authAPI } from '../services/api';
 
 const AuthContext = createContext();
 
@@ -54,15 +53,6 @@ export const AuthProvider = ({ children }) => {
     window.addEventListener('auth:unauthorized', handleUnauthorized);
     return () => window.removeEventListener('auth:unauthorized', handleUnauthorized);
   }, [checkAuth, logout]);
-
-  useEffect(() => {
-    if (!token || !user?._id) return undefined;
-    let active = true;
-    ensureDeviceKeyPair(user._id, messageAPI).catch((error) => {
-      if (active) console.warn('[MessageKeySetup] Automatic setup will retry when Messages opens:', error.message);
-    });
-    return () => { active = false; };
-  }, [token, user?._id]);
 
   // Login handler
   const login = async (email, password) => {

@@ -131,6 +131,7 @@ export const messageAPI = {
   openConversation: (userId) => api.post(`/messages/conversations/${userId}`),
   getMessages: (conversationId) => api.get(`/messages/conversations/${conversationId}/messages`),
   sendMessage: (conversationId, payload) => api.post(`/messages/conversations/${conversationId}/messages`, payload),
+  syncLegacyMessages: (conversationId, messages) => api.post(`/messages/conversations/${conversationId}/messages/sync-legacy`, { messages }),
 };
 
 export default api;
