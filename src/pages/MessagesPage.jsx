@@ -443,13 +443,15 @@ const MessagesPage = () => {
 
   return (
     <Container maxWidth="xl" sx={{ minWidth: 0 }}>
-      <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 2.5 }}>
-        <ChatBubbleOutlineRoundedIcon color="primary" />
-        <Box sx={{ minWidth: 0 }}>
-          <Typography variant="h5" fontWeight={800}>Messages</Typography>
-          <Typography variant="body2" color="text.secondary">Chat with your accepted connections on any device after you sign in</Typography>
-        </Box>
-      </Stack>
+      {!active && (
+        <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 2.5 }}>
+          <ChatBubbleOutlineRoundedIcon color="primary" />
+          <Box sx={{ minWidth: 0 }}>
+            <Typography variant="h5" fontWeight={800}>Messages</Typography>
+            <Typography variant="body2" color="text.secondary">Chat with your accepted connections on any device after you sign in</Typography>
+          </Box>
+        </Stack>
+      )}
 
       {error && <Alert severity="warning" sx={{ mb: 2 }}>{error}</Alert>}
       {backupPrompt && (
@@ -464,8 +466,10 @@ const MessagesPage = () => {
         sx={{
           display: 'grid',
           gridTemplateColumns: mobile && active ? 'minmax(0, 1fr)' : { xs: 'minmax(0, 1fr)', md: '360px minmax(0, 1fr)' },
-          height: { xs: 'min(68dvh, 640px)', md: 'min(72dvh, 760px)' },
-          minHeight: { xs: 400, md: 520 },
+          height: active
+            ? { xs: 'calc(100dvh - 155px)', md: 'calc(100dvh - 180px)' }
+            : { xs: 'min(68dvh, 640px)', md: 'min(72dvh, 760px)' },
+          minHeight: active ? { xs: 420, md: 540 } : { xs: 400, md: 520 },
           overflow: 'hidden',
           borderRadius: 3,
           bgcolor: 'background.paper',
