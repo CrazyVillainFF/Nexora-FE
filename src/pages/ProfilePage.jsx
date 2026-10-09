@@ -240,6 +240,7 @@ const ProfilePage = () => {
             ) : (
               <ConnectionButton
                 userId={profile._id}
+                userName={profile.name}
                 initialStatus={profile.connectionStatus}
                 connectionId={profile.connectionId}
               />

@@ -1,5 +1,6 @@
 const DATABASE = 'nexora-device-keys';
 const STORE = 'rsa-key-pairs';
+const keySetupPromises = new Map();
 
 const getDatabase = () => new Promise((resolve, reject) => {
   if (!globalThis.indexedDB || !globalThis.crypto?.subtle) {
@@ -48,6 +49,47 @@ export const createDeviceKeyPair = async (userId) => {
   };
   await saveDeviceKeyPair(userId, devicePair);
   return devicePair;
+};
+
+export const ensureDeviceKeyPair = (userId, messageAPI) => {
+  const accountId = userId?.toString();
+  if (!accountId) return Promise.reject(new Error('Sign in before setting up encrypted messages.'));
+  if (keySetupPromises.has(accountId)) return keySetupPromises.get(accountId);
+
+  const runSetup = async () => {
+    const [serverKey, savedPair] = await Promise.all([
+      messageAPI.getOwnKey(),
+      getDeviceKeyPair(accountId)
+    ]);
+    let devicePair = savedPair;
+    const hasServerKey = Boolean(serverKey.data.publicKey || serverKey.data.signingPublicKey);
+
+    if (hasServerKey && !devicePair) {
+      throw new Error('This browser does not have the private key for existing encrypted messages. They cannot be recovered on a new device.');
+    }
+    if (hasServerKey && (!serverKey.data.publicKey || !serverKey.data.signingPublicKey)) {
+      throw new Error('The account encryption keys are incomplete. Encrypted messaging is paused for safety.');
+    }
+    if (!devicePair) devicePair = await createDeviceKeyPair(accountId);
+
+    if (!hasServerKey) {
+      await messageAPI.saveOwnKey(devicePair.serializedPublicKey, devicePair.serializedSigningPublicKey);
+    } else if (devicePair.serializedPublicKey !== serverKey.data.publicKey ||
+        devicePair.serializedSigningPublicKey !== serverKey.data.signingPublicKey) {
+      throw new Error('This browser key does not match the account key. Encrypted messaging is paused for safety.');
+    }
+
+    return devicePair;
+  };
+  const setup = globalThis.navigator?.locks?.request
+    ? navigator.locks.request(`nexora-device-key-${accountId}`, runSetup)
+    : runSetup();
+
+  keySetupPromises.set(accountId, setup);
+  setup.finally(() => {
+    if (keySetupPromises.get(accountId) === setup) keySetupPromises.delete(accountId);
+  }).catch(() => {});
+  return setup;
 };
 
 const decodeJwk = async (serialized) => {

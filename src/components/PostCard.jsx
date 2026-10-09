@@ -61,6 +61,7 @@ const PostCard = ({ post, onPostDeleted, onPostUpdated }) => {
 
   // Snackbar state
   const [toastMessage, setToastMessage] = useState(null);
+  const [toastSeverity, setToastSeverity] = useState('success');
 
   const author = post.author || {};
   const isAuthor = currentUser && currentUser._id === (typeof author === 'string' ? author : author._id);
@@ -121,9 +122,13 @@ const PostCard = ({ post, onPostDeleted, onPostUpdated }) => {
         setComments((prev) => [...prev, res.data.comment]);
         setCommentCount((prev) => prev + 1);
         setNewComment('');
+        setToastSeverity('success');
+        setToastMessage('Comment added.');
       }
     } catch (err) {
       console.error('[Add Comment Error]', err.message);
+      setToastSeverity('error');
+      setToastMessage(err.message || 'Could not add your comment. Please try again.');
     } finally {
       setSubmittingComment(false);
     }
@@ -412,38 +417,47 @@ const PostCard = ({ post, onPostDeleted, onPostUpdated }) => {
         {showComments && (
           <Box sx={{ bgcolor: 'action.hover', p: 2, borderTop: (theme) => `1px solid ${theme.palette.divider}` }}>
             {/* New Comment Input */}
-            <Stack direction="row" spacing={1.5} alignItems="flex-start" sx={{ mb: 2 }}>
-              <Avatar
-                src={currentUser?.profilePicture}
-                alt={currentUser?.name}
-                sx={{ width: 36, height: 36 }}
-              >
-                {currentUser?.name ? currentUser.name[0] : 'U'}
-              </Avatar>
-              <Box component="form" onSubmit={handleAddComment} sx={{ flex: 1 }}>
-                <TextField
-                  fullWidth
-                  size="small"
-                  placeholder="Write a constructive comment..."
-                  value={newComment}
-                  onChange={(e) => setNewComment(e.target.value)}
-                  disabled={submittingComment}
-                  InputProps={{
-                    endAdornment: (
-                      <IconButton
-                        size="small"
-                        color="primary"
-                        type="submit"
-                        disabled={!newComment.trim() || submittingComment}
-                      >
-                        {submittingComment ? <CircularProgress size={16} /> : <SendRoundedIcon fontSize="small" />}
-                      </IconButton>
-                    ),
-                    sx: { bgcolor: 'background.paper', borderRadius: 3 }
-                  }}
-                />
+            {isAuthenticated ? (
+              <Stack direction="row" spacing={1.5} alignItems="flex-start" sx={{ mb: 2 }}>
+                <Avatar
+                  src={currentUser?.profilePicture}
+                  alt={currentUser?.name}
+                  sx={{ width: 36, height: 36 }}
+                >
+                  {currentUser?.name ? currentUser.name[0] : 'U'}
+                </Avatar>
+                <Box component="form" onSubmit={handleAddComment} sx={{ flex: 1 }}>
+                  <TextField
+                    fullWidth
+                    size="small"
+                    placeholder="Write a comment..."
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                    disabled={submittingComment}
+                    InputProps={{
+                      endAdornment: (
+                        <IconButton
+                          size="small"
+                          color="primary"
+                          type="submit"
+                          aria-label="Post comment"
+                          disabled={!newComment.trim() || submittingComment}
+                        >
+                          {submittingComment ? <CircularProgress size={16} /> : <SendRoundedIcon fontSize="small" />}
+                        </IconButton>
+                      ),
+                      sx: { bgcolor: 'background.paper', borderRadius: 3 }
+                    }}
+                  />
+                </Box>
+              </Stack>
+            ) : (
+              <Box sx={{ mb: 2 }}>
+                <Button size="small" variant="outlined" onClick={() => navigate('/signin')}>
+                  Sign in to comment
+                </Button>
               </Box>
-            </Stack>
+            )}
 
             {/* Comments List */}
             {loadingComments ? (
@@ -568,7 +582,7 @@ const PostCard = ({ post, onPostDeleted, onPostUpdated }) => {
         onClose={() => setToastMessage(null)}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >
-        <Alert severity="success" sx={{ borderRadius: 2 }}>
+        <Alert severity={toastSeverity} sx={{ borderRadius: 2 }}>
           {toastMessage}
         </Alert>
       </Snackbar>

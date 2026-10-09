@@ -128,6 +128,7 @@ const UserCard = ({ user, onConnectionChanged }) => {
         <Box sx={{ mt: 'auto', pt: 1 }} onClick={(e) => e.stopPropagation()}>
           <ConnectionButton
             userId={user._id}
+            userName={user.name}
             initialStatus={user.connectionStatus || 'none'}
             size="small"
             onStatusChange={onConnectionChanged}

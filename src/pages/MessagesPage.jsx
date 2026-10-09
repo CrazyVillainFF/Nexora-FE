@@ -5,13 +5,12 @@ import {
   Typography, useMediaQuery
 } from '@mui/material';
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
-import LockRoundedIcon from '@mui/icons-material/LockRounded';
 import SendRoundedIcon from '@mui/icons-material/SendRounded';
 import ChatBubbleOutlineRoundedIcon from '@mui/icons-material/ChatBubbleOutlineRounded';
 import { useTheme } from '@mui/material/styles';
 import { useAuth } from '../context/AuthContext';
 import { messageAPI } from '../services/api';
-import { createDeviceKeyPair, decryptMessage, encryptForConversation, getDeviceKeyPair, getKeyFingerprint } from '../utils/e2ee';
+import { decryptMessage, encryptForConversation, ensureDeviceKeyPair, getKeyFingerprint } from '../utils/e2ee';
 
 const formatTimestamp = (value) => new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit' }).format(new Date(value));
 
@@ -23,6 +22,7 @@ const MessagesPage = () => {
   const [contacts, setContacts] = useState([]);
   const [conversations, setConversations] = useState([]);
   const [active, setActive] = useState(null);
+  const [preparingContact, setPreparingContact] = useState(null);
   const [messages, setMessages] = useState([]);
   const [draft, setDraft] = useState('');
   const [privateKey, setPrivateKey] = useState(null);
@@ -64,20 +64,7 @@ const MessagesPage = () => {
       try {
         setLoading(true);
         setError('');
-        const serverKey = await messageAPI.getOwnKey();
-        let devicePair = await getDeviceKeyPair(user._id);
-
-        if (serverKey.data.publicKey && !devicePair) {
-          throw new Error('This account already has an encryption key, but this browser does not. For safety, existing messages cannot be recovered on a new device. Key recovery is not available.');
-        }
-        if (!serverKey.data.publicKey && devicePair) {
-          await messageAPI.saveOwnKey(devicePair.serializedPublicKey, devicePair.serializedSigningPublicKey);
-        } else if (!devicePair) {
-          devicePair = await createDeviceKeyPair(user._id);
-          await messageAPI.saveOwnKey(devicePair.serializedPublicKey, devicePair.serializedSigningPublicKey);
-        } else if (devicePair.serializedPublicKey !== serverKey.data.publicKey || devicePair.serializedSigningPublicKey !== serverKey.data.signingPublicKey) {
-          throw new Error('The device key does not match the registered account key. Messages are paused to protect access to existing conversations.');
-        }
+        const devicePair = await ensureDeviceKeyPair(user._id, messageAPI);
         if (cancelled) return;
 
         setPrivateKey(devicePair.privateKey);
@@ -120,15 +107,27 @@ const MessagesPage = () => {
     bottomRef.current?.scrollIntoView({ block: 'end', behavior: 'smooth' });
   }, [messages.length]);
 
-  const openConversation = async (contact) => {
+  const openConversation = useCallback(async (contact) => {
     try {
       setError('');
+      setPreparingContact(contact);
       const response = await messageAPI.openConversation(contact._id);
+      setMessages([]);
+      setLoadingMessages(true);
       setActive({ ...response.data.conversation, peer: { ...contact, ...response.data.conversation.peer } });
+      setPreparingContact(null);
     } catch (openError) {
+      if (openError.message?.includes('Both people need to set up an encryption key')) return;
+      setPreparingContact(null);
       setError(openError.message || 'Could not open this conversation.');
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    if (!preparingContact) return undefined;
+    const interval = window.setInterval(() => openConversation(preparingContact), 10000);
+    return () => window.clearInterval(interval);
+  }, [preparingContact, openConversation]);
 
   const sendMessage = async (event) => {
     event.preventDefault();
@@ -158,24 +157,20 @@ const MessagesPage = () => {
   }, [contacts, conversations]);
 
   if (loading) {
-    return <Container maxWidth="md"><Stack alignItems="center" spacing={2} sx={{ py: 8 }}><CircularProgress /><Typography color="text.secondary">Setting up this device’s encrypted messages…</Typography></Stack></Container>;
+    return <Container maxWidth="md"><Stack alignItems="center" spacing={2} sx={{ py: 8 }}><CircularProgress /><Typography color="text.secondary">Loading messages…</Typography></Stack></Container>;
   }
 
   return (
     <Container maxWidth="lg" sx={{ minWidth: 0 }}>
       <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 2.5 }}>
-        <LockRoundedIcon color="primary" />
+        <ChatBubbleOutlineRoundedIcon color="primary" />
         <Box sx={{ minWidth: 0 }}>
           <Typography variant="h5" fontWeight={800}>Messages</Typography>
-          <Typography variant="body2" color="text.secondary">Encrypted on this device</Typography>
+          <Typography variant="body2" color="text.secondary">Chat with your accepted connections</Typography>
         </Box>
       </Stack>
 
       {error && <Alert severity="warning" sx={{ mb: 2 }}>{error}</Alert>}
-      <Alert severity="info" icon={<LockRoundedIcon />} sx={{ mb: 2.5 }}>
-        Message content is encrypted on your device with AES-GCM, message keys are protected for both participants using RSA-OAEP, and ECDSA signatures detect message changes or impersonation. Private keys stay in this browser. Compare safety fingerprints through another trusted channel because the server can replace public keys. New devices and lost browser storage cannot recover old messages.
-      </Alert>
-
       <Paper variant="outlined" sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '300px minmax(0, 1fr)' }, minHeight: { xs: 'min(68dvh, 650px)', md: 620 }, overflow: 'hidden' }}>
         {(!mobile || !active) && (
           <Box sx={{ borderRight: { md: 1 }, borderColor: 'divider', minWidth: 0 }}>
@@ -188,7 +183,7 @@ const MessagesPage = () => {
                     <ListItemAvatar><Avatar src={contact.profilePicture} alt="">{contact.name?.[0] || 'N'}</Avatar></ListItemAvatar>
                     <ListItemText
                       primary={contact.name}
-                      secondary={contact.encryptionPublicKey && contact.encryptionSigningPublicKey ? (fingerprints[contact._id] ? `Key: ${fingerprints[contact._id]}` : contact.headline || 'Encrypted connection') : 'Encryption setup needed'}
+                      secondary={contact.headline || 'Accepted connection'}
                       primaryTypographyProps={{ noWrap: true, fontWeight: 650 }}
                       secondaryTypographyProps={{ noWrap: true, fontSize: '0.7rem' }}
                     />
@@ -214,7 +209,7 @@ const MessagesPage = () => {
                       {fingerprints[active.peer._id] ? `Fingerprint ${fingerprints[active.peer._id]}` : active.peer.headline || 'Encrypted conversation'}
                     </Typography>
                   </Box>
-                  <LockRoundedIcon fontSize="small" color="success" aria-label="Encrypted conversation" />
+                  <ChatBubbleOutlineRoundedIcon fontSize="small" color="primary" aria-label="Conversation" />
                 </Stack>
                 <Box sx={{ flex: 1, minHeight: 0, overflowY: 'auto', p: { xs: 1.5, sm: 2.5 }, display: 'flex', flexDirection: 'column', gap: 1.25 }} aria-live="polite">
                   {loadingMessages && !messages.length ? <CircularProgress size={24} sx={{ alignSelf: 'center', mt: 3 }} /> : null}
@@ -243,21 +238,33 @@ const MessagesPage = () => {
                 </Box>
                 <Box component="form" onSubmit={sendMessage} sx={{ p: 1.25, borderTop: 1, borderColor: 'divider', display: 'flex', gap: 1, alignItems: 'flex-end' }}>
                   <TextField
-                    fullWidth multiline maxRows={4} size="small" label="Encrypted message" value={draft}
+                    fullWidth multiline maxRows={4} size="small" label="Message" value={draft}
                     onChange={(event) => setDraft(event.target.value.slice(0, 5000))}
                     inputProps={{ maxLength: 5000 }}
                     placeholder="Write a message…"
                   />
-                  <Button type="submit" variant="contained" aria-label="Send encrypted message" disabled={!draft.trim() || sending || !active.peer.encryptionPublicKey || !active.peer.encryptionSigningPublicKey} sx={{ minWidth: 48, width: 48, height: 40, px: 0 }}>
+                  <Button type="submit" variant="contained" aria-label="Send message" disabled={!draft.trim() || sending || !active.peer.encryptionPublicKey || !active.peer.encryptionSigningPublicKey} sx={{ minWidth: 48, width: 48, height: 40, px: 0 }}>
                     {sending ? <CircularProgress size={18} color="inherit" /> : <SendRoundedIcon />}
                   </Button>
                 </Box>
               </>
             ) : (
               <Stack alignItems="center" justifyContent="center" sx={{ flex: 1, minHeight: 300, p: 4, textAlign: 'center' }}>
-                <LockRoundedIcon color="primary" sx={{ fontSize: 36, mb: 1 }} />
-                <Typography variant="h6" fontWeight={700}>Private conversations</Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 380 }}>Choose an accepted connection to open an encrypted chat. The server stores message ciphertext and cannot read the content.</Typography>
+                {preparingContact ? (
+                  <>
+                    <CircularProgress size={30} sx={{ mb: 1.5 }} />
+                    <Typography variant="h6" fontWeight={700}>Getting your chat ready</Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 380 }}>
+                      {preparingContact.name} will be ready to message after their next sign-in. This will update automatically.
+                    </Typography>
+                  </>
+                ) : (
+                  <>
+                    <ChatBubbleOutlineRoundedIcon color="primary" sx={{ fontSize: 36, mb: 1 }} />
+                    <Typography variant="h6" fontWeight={700}>Your messages</Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 380 }}>Choose an accepted connection to start chatting.</Typography>
+                  </>
+                )}
               </Stack>
             )}
           </Box>

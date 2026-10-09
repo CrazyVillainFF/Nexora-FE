@@ -105,7 +105,7 @@ const RightWidgets = () => {
                       {user.headline || user.company || 'Professional'}
                     </Typography>
                     <Box sx={{ mt: 0.5 }}>
-                      <ConnectionButton userId={user._id} initialStatus="none" size="small" />
+                      <ConnectionButton userId={user._id} userName={user.name} initialStatus="none" size="small" />
                     </Box>
                   </Box>
                 </Stack>
