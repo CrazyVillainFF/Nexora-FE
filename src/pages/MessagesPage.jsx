@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
-  Alert, Avatar, Box, Button, CircularProgress, Container, Divider, IconButton, InputAdornment, List,
-  ListItemButton, ListItemAvatar, ListItemText, Paper, Skeleton, Stack, TextField,
+  Alert, Avatar, Box, Button, CircularProgress, Container, Dialog, DialogActions, DialogContent, DialogTitle, Divider, IconButton, InputAdornment, List,
+  ListItem, ListItemButton, ListItemAvatar, ListItemText, Menu, MenuItem, Paper, Skeleton, Stack, TextField,
   Typography, useMediaQuery
 } from '@mui/material';
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
@@ -9,6 +9,7 @@ import SendRoundedIcon from '@mui/icons-material/SendRounded';
 import ChatBubbleOutlineRoundedIcon from '@mui/icons-material/ChatBubbleOutlineRounded';
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
 import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded';
+import MoreHorizRoundedIcon from '@mui/icons-material/MoreHorizRounded';
 import EmojiPickerControl from '../components/EmojiPickerControl';
 import { useTheme } from '@mui/material/styles';
 import { useAuth } from '../context/AuthContext';
@@ -49,6 +50,11 @@ const MessagesPage = () => {
   const [sending, setSending] = useState(false);
   const [error, setError] = useState('');
   const [search, setSearch] = useState('');
+  const [chatMenu, setChatMenu] = useState(null);
+  const [chatToEdit, setChatToEdit] = useState(null);
+  const [chatNameDraft, setChatNameDraft] = useState('');
+  const [chatToDelete, setChatToDelete] = useState(null);
+  const [chatActionLoading, setChatActionLoading] = useState(false);
   const bottomRef = useRef(null);
   const searchRef = useRef(null);
   const composerInputRef = useRef(null);
@@ -58,6 +64,67 @@ const MessagesPage = () => {
   const selectedConversationId = useRef(null);
   const messageRequestId = useRef(0);
   const openRequestId = useRef(0);
+  const longPressTimer = useRef(null);
+  const longPressTriggered = useRef(false);
+
+  const openChatActions = (contact, conversation, anchorEl, anchorPosition) => {
+    if (!conversation) return;
+    setChatMenu({ contact, conversation, anchorEl, anchorPosition });
+  };
+  const clearLongPress = () => {
+    if (longPressTimer.current) window.clearTimeout(longPressTimer.current);
+    longPressTimer.current = null;
+  };
+  const beginLongPress = (event, contact, conversation) => {
+    if (!conversation) return;
+    clearLongPress();
+    longPressTriggered.current = false;
+    const touch = event.touches?.[0];
+    if (!touch) return;
+    const anchorPosition = { top: touch.clientY, left: touch.clientX };
+    longPressTimer.current = window.setTimeout(() => {
+      longPressTriggered.current = true;
+      openChatActions(contact, conversation, null, anchorPosition);
+    }, 550);
+  };
+
+  const saveChatName = async () => {
+    if (!chatToEdit) return;
+    setChatActionLoading(true);
+    try {
+      const { data } = await messageAPI.updateConversationName(chatToEdit._id, chatNameDraft.trim());
+      setConversations((existing) => existing.map((conversation) => (
+        String(conversation._id) === String(chatToEdit._id) ? { ...conversation, displayName: data.displayName } : conversation
+      )));
+      setActive((current) => current && String(current._id) === String(chatToEdit._id)
+        ? { ...current, displayName: data.displayName }
+        : current);
+      setChatToEdit(null);
+    } catch (actionError) {
+      setError(actionError.message || 'Could not update this chat name.');
+    } finally {
+      setChatActionLoading(false);
+    }
+  };
+
+  const deleteChat = async () => {
+    if (!chatToDelete) return;
+    setChatActionLoading(true);
+    try {
+      await messageAPI.deleteConversation(chatToDelete._id);
+      setConversations((existing) => existing.filter((conversation) => String(conversation._id) !== String(chatToDelete._id)));
+      if (String(active?._id) === String(chatToDelete._id)) {
+        selectedConversationId.current = null;
+        setActive(null);
+        setMessages([]);
+      }
+      setChatToDelete(null);
+    } catch (actionError) {
+      setError(actionError.message || 'Could not delete this chat.');
+    } finally {
+      setChatActionLoading(false);
+    }
+  };
 
   const loadMessages = useCallback(async (conversationId, key, peerSigningPublicKey) => {
     if (!userId) return;
@@ -392,10 +459,33 @@ const MessagesPage = () => {
                       ? (conversation.lastMessage.text || (isOwnLastMessage ? 'You sent a message' : 'Message'))
                       : (contact.headline || 'Start a conversation');
                     return (
-                      <ListItemButton
+                      <ListItem
                         key={contact._id}
+                        disablePadding
+                        secondaryAction={conversation ? (
+                          <IconButton
+                            aria-label={`Chat options for ${contact.name || 'connection'}`}
+                            edge="end"
+                            onClick={(event) => openChatActions(contact, conversation, event.currentTarget, null)}
+                            sx={{ mr: 0.5 }}
+                          ><MoreHorizRoundedIcon /></IconButton>
+                        ) : null}
+                        onTouchStart={(event) => beginLongPress(event, contact, conversation)}
+                        onTouchMove={clearLongPress}
+                        onTouchEnd={clearLongPress}
+                        onTouchCancel={clearLongPress}
+                        onContextMenu={(event) => {
+                          if (!conversation) return;
+                          event.preventDefault();
+                          openChatActions(contact, conversation, null, { top: event.clientY, left: event.clientX });
+                        }}
+                      >
+                      <ListItemButton
                         selected={String(active?.peer?._id) === String(contact._id)}
-                        onClick={() => openConversation(contact)}
+                        onClick={() => {
+                          if (longPressTriggered.current) { longPressTriggered.current = false; return; }
+                          openConversation(contact);
+                        }}
                         aria-label={`Open chat with ${contact.name || 'connection'}`}
                         sx={{
                           minWidth: 0,
@@ -408,7 +498,7 @@ const MessagesPage = () => {
                       >
                         <ListItemAvatar sx={{ minWidth: 62 }}><Avatar src={contact.profilePicture} alt="" sx={{ width: 50, height: 50 }}>{contact.name?.[0] || 'N'}</Avatar></ListItemAvatar>
                         <ListItemText
-                          primary={contact.name || 'Nexora member'}
+                          primary={conversation?.displayName || contact.name || 'Nexora member'}
                           secondary={preview}
                           primaryTypographyProps={{ noWrap: true, fontWeight: 650 }}
                           secondaryTypographyProps={{ noWrap: true, fontSize: '0.78rem', color: 'text.secondary' }}
@@ -417,6 +507,7 @@ const MessagesPage = () => {
                           {hasMessages && <Typography variant="caption" color="text.secondary" noWrap>{formatConversationTime(conversation.lastMessageAt || conversation.lastMessage.createdAt)}</Typography>}
                         </Stack>
                       </ListItemButton>
+                      </ListItem>
                     );
                   })}
                 </List>
@@ -440,7 +531,7 @@ const MessagesPage = () => {
                   {mobile && <IconButton aria-label="Back to chats" onClick={() => { selectedConversationId.current = null; setActive(null); setMessages([]); }} size="small"><ArrowBackRoundedIcon /></IconButton>}
                   <Avatar src={active.peer.profilePicture} alt="" sx={{ width: 42, height: 42 }}>{active.peer.name?.[0] || 'N'}</Avatar>
                   <Box sx={{ minWidth: 0, flex: 1 }}>
-                    <Typography variant="subtitle1" fontWeight={700} noWrap>{active.peer.name}</Typography>
+                    <Typography variant="subtitle1" fontWeight={700} noWrap>{active.displayName || active.peer.name}</Typography>
                     <Typography variant="caption" color="text.secondary" noWrap>{active.peer.headline || 'Nexora connection'}</Typography>
                   </Box>
                   <Typography variant="caption" color="text.secondary" sx={{ flexShrink: 0, display: { xs: 'none', sm: 'block' } }}>Synced to your account</Typography>
@@ -501,6 +592,43 @@ const MessagesPage = () => {
           </Box>
         )}
       </Paper>
+      <Menu
+        open={Boolean(chatMenu)}
+        onClose={() => setChatMenu(null)}
+        anchorEl={chatMenu?.anchorEl || undefined}
+        anchorReference={chatMenu?.anchorPosition ? 'anchorPosition' : 'anchorEl'}
+        anchorPosition={chatMenu?.anchorPosition || undefined}
+      >
+        <MenuItem onClick={() => {
+          setChatNameDraft(chatMenu?.conversation.displayName || '');
+          setChatToEdit(chatMenu?.conversation || null);
+          setChatMenu(null);
+        }}>Edit chat name</MenuItem>
+        <MenuItem sx={{ color: 'error.main' }} onClick={() => {
+          setChatToDelete(chatMenu?.conversation || null);
+          setChatMenu(null);
+        }}>Delete chat</MenuItem>
+      </Menu>
+      <Dialog open={Boolean(chatToEdit)} onClose={() => !chatActionLoading && setChatToEdit(null)} fullWidth maxWidth="xs">
+        <DialogTitle>Edit chat name</DialogTitle>
+        <DialogContent>
+          <TextField autoFocus fullWidth label="Chat name" value={chatNameDraft} onChange={(event) => setChatNameDraft(event.target.value.slice(0, 80))} inputProps={{ maxLength: 80 }} helperText="Leave blank to use the person’s profile name." sx={{ mt: 1 }} />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setChatToEdit(null)} disabled={chatActionLoading}>Cancel</Button>
+          <Button onClick={saveChatName} disabled={chatActionLoading}>{chatActionLoading ? 'Saving…' : 'Save'}</Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog open={Boolean(chatToDelete)} onClose={() => !chatActionLoading && setChatToDelete(null)} fullWidth maxWidth="xs">
+        <DialogTitle>Delete this chat?</DialogTitle>
+        <DialogContent>
+          <Typography color="text.secondary">This removes the chat from your inbox only. Your connection and the other person’s chat stay unchanged. You can open this person’s chat again from your connections later.</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setChatToDelete(null)} disabled={chatActionLoading}>Cancel</Button>
+          <Button color="error" onClick={deleteChat} disabled={chatActionLoading}>{chatActionLoading ? 'Deleting…' : 'Delete chat'}</Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };
