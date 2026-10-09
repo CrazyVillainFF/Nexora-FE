@@ -38,6 +38,9 @@ const MobileBottomNav = () => {
           bottom: 0,
           left: 0,
           right: 0,
+          width: '100%',
+          boxSizing: 'border-box',
+          overflowX: 'clip',
           zIndex: 1300,
           display: { xs: 'block', md: 'none' },
           borderTop: (theme) => `1px solid ${theme.palette.divider}`,
@@ -61,16 +64,17 @@ const MobileBottomNav = () => {
           }}
           sx={{
             height: 62,
+            width: '100%',
             bgcolor: 'transparent',
-            '& .MuiBottomNavigationAction-root': { minWidth: 0, maxWidth: 'none', px: 0.25 },
-            '& .MuiBottomNavigationAction-label': { fontSize: '0.64rem', whiteSpace: 'nowrap' },
+            '& .MuiBottomNavigationAction-root': { flex: '1 1 20%', minWidth: 0, maxWidth: 'none', px: 0.125, overflow: 'hidden' },
+            '& .MuiBottomNavigationAction-label': { fontSize: { xs: '0.6rem', sm: '0.68rem' }, whiteSpace: 'nowrap' },
             '& .Mui-selected': { color: 'primary.main', fontWeight: 700 },
           }}
         >
           <BottomNavigationAction label="Home" value="/home" aria-label="Home" icon={<HomeRoundedIcon />} />
           <BottomNavigationAction label="Message" value="/messages" aria-label="Messages" icon={<ChatBubbleOutlineRoundedIcon />} />
           <BottomNavigationAction
-            label="+"
+            label=""
             value="create"
             aria-label="Create post"
             icon={(

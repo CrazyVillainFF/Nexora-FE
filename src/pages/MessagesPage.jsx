@@ -64,13 +64,6 @@ const MessagesPage = () => {
       try {
         setLoading(true);
         setError('');
-        const devicePair = await ensureDeviceKeyPair(user._id, messageAPI);
-        if (cancelled) return;
-
-        setPrivateKey(devicePair.privateKey);
-        setSigningPrivateKey(devicePair.signingPrivateKey);
-        setOwnPublicKey(devicePair.serializedPublicKey);
-        setOwnSigningPublicKey(devicePair.serializedSigningPublicKey);
         const [contactResponse, conversationResponse] = await Promise.all([
           messageAPI.getContacts(),
           messageAPI.getConversations()
@@ -79,6 +72,13 @@ const MessagesPage = () => {
         const nextContacts = contactResponse.data.contacts || [];
         setContacts(nextContacts);
         setConversations(conversationResponse.data.conversations || []);
+
+        const devicePair = await ensureDeviceKeyPair(user._id, messageAPI);
+        if (cancelled) return;
+        setPrivateKey(devicePair.privateKey);
+        setSigningPrivateKey(devicePair.signingPrivateKey);
+        setOwnPublicKey(devicePair.serializedPublicKey);
+        setOwnSigningPublicKey(devicePair.serializedSigningPublicKey);
         const ownFingerprint = await getKeyFingerprint(devicePair.serializedPublicKey, devicePair.serializedSigningPublicKey);
         const peerFingerprints = await Promise.all(nextContacts.filter((contact) => contact.encryptionPublicKey && contact.encryptionSigningPublicKey).map(async (contact) => [
           contact._id,
@@ -170,7 +170,13 @@ const MessagesPage = () => {
         </Box>
       </Stack>
 
-      {error && <Alert severity="warning" sx={{ mb: 2 }}>{error}</Alert>}
+      {error && (
+        <Alert severity={error.includes('does not have the private key') ? 'info' : 'warning'} sx={{ mb: 2 }}>
+          {error.includes('does not have the private key')
+            ? 'This phone does not have the private key for your existing messages. To keep your message history, open Messages on the device where you first set it up.'
+            : error}
+        </Alert>
+      )}
       <Paper variant="outlined" sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '300px minmax(0, 1fr)' }, minHeight: { xs: 'min(68dvh, 650px)', md: 620 }, overflow: 'hidden' }}>
         {(!mobile || !active) && (
           <Box sx={{ borderRight: { md: 1 }, borderColor: 'divider', minWidth: 0 }}>
@@ -179,7 +185,7 @@ const MessagesPage = () => {
             {orderedContacts.length ? (
               <List disablePadding>
                 {orderedContacts.map((contact) => (
-                  <ListItemButton key={contact._id} selected={active?.peer?._id === contact._id} onClick={() => openConversation(contact)} sx={{ minWidth: 0, alignItems: 'center' }}>
+                  <ListItemButton key={contact._id} selected={active?.peer?._id === contact._id} disabled={!privateKey} onClick={() => openConversation(contact)} sx={{ minWidth: 0, alignItems: 'center' }}>
                     <ListItemAvatar><Avatar src={contact.profilePicture} alt="">{contact.name?.[0] || 'N'}</Avatar></ListItemAvatar>
                     <ListItemText
                       primary={contact.name}

@@ -62,7 +62,7 @@ const HomePage = () => {
   const openComposer = () => window.dispatchEvent(new Event('nexora:create-post'));
 
   return (
-    <Container maxWidth="md" sx={{ minWidth: 0 }}>
+    <Container maxWidth="md" sx={{ width: '100%', minWidth: 0 }}>
       <Box sx={{ mb: 2.5, py: 0.5, minWidth: 0 }} aria-label="Filter posts by topic">
         <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
           {FILTER_TOPICS.map((tag) => (
@@ -87,7 +87,7 @@ const HomePage = () => {
       ) : error ? (
         <ErrorState message={error} onRetry={() => fetchFeed(selectedTag, 1, false)} />
       ) : posts.length > 0 ? (
-        <Stack spacing={0} sx={{ minWidth: 0 }}>
+        <Stack spacing={0} sx={{ minWidth: 0, width: '100%' }}>
           {posts.map((post) => (
             <PostCard
               key={post._id}

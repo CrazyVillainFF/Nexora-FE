@@ -10,9 +10,8 @@ import {
   Button,
   Stack,
   Box,
+  Collapse,
   Divider,
-  Menu,
-  MenuItem,
   TextField,
   CircularProgress,
   Dialog,
@@ -213,7 +212,7 @@ const PostCard = ({ post, onPostDeleted, onPostUpdated }) => {
 
   return (
     <>
-      <Card sx={{ mb: 2.5, position: 'relative' }}>
+      <Card sx={{ mb: 2.5, position: 'relative', width: '100%', minWidth: 0, overflow: 'visible' }}>
         {/* Post Header */}
         <CardHeader
           avatar={
@@ -228,7 +227,12 @@ const PostCard = ({ post, onPostDeleted, onPostUpdated }) => {
           }
           action={
             isAuthor ? (
-              <IconButton size="small" onClick={(e) => setAnchorEl(e.currentTarget)}>
+              <IconButton
+                size="small"
+                aria-label="Post options"
+                aria-expanded={Boolean(anchorEl)}
+                onClick={(event) => setAnchorEl((current) => current ? null : event.currentTarget)}
+              >
                 <MoreVertRoundedIcon />
               </IconButton>
             ) : null
@@ -256,33 +260,38 @@ const PostCard = ({ post, onPostDeleted, onPostUpdated }) => {
           sx={{ pb: 1 }}
         />
 
-        {/* Post Author Options Menu */}
-        <Menu
-          anchorEl={anchorEl}
-          open={Boolean(anchorEl)}
-          onClose={() => setAnchorEl(null)}
-          PaperProps={{ sx: { borderRadius: 2.5, minWidth: 140 } }}
-        >
-          <MenuItem
-            onClick={() => {
-              setAnchorEl(null);
-              setIsEditing(true);
-            }}
+        <Collapse in={Boolean(anchorEl)} unmountOnExit>
+          <Stack
+            direction="row"
+            useFlexGap
+            flexWrap="wrap"
+            justifyContent="flex-end"
+            spacing={0.5}
+            sx={{ px: 1.5, py: 0.75, bgcolor: 'action.hover', borderTop: 1, borderColor: 'divider' }}
           >
-            <EditOutlinedIcon fontSize="small" sx={{ mr: 1.5, color: 'text.secondary' }} />
-            Edit Post
-          </MenuItem>
-          <MenuItem
-            onClick={() => {
-              setAnchorEl(null);
-              setDeleteConfirmOpen(true);
-            }}
-            sx={{ color: 'error.main' }}
-          >
-            <DeleteOutlineRoundedIcon fontSize="small" sx={{ mr: 1.5 }} />
-            Delete Post
-          </MenuItem>
-        </Menu>
+            <Button
+              size="small"
+              startIcon={<EditOutlinedIcon fontSize="small" />}
+              onClick={() => {
+                setAnchorEl(null);
+                setIsEditing(true);
+              }}
+            >
+              Edit post
+            </Button>
+            <Button
+              size="small"
+              color="error"
+              startIcon={<DeleteOutlineRoundedIcon fontSize="small" />}
+              onClick={() => {
+                setAnchorEl(null);
+                setDeleteConfirmOpen(true);
+              }}
+            >
+              Delete post
+            </Button>
+          </Stack>
+        </Collapse>
 
         {/* Post Content */}
         <CardContent sx={{ pt: 1, pb: 1.5 }}>

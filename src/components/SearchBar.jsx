@@ -79,7 +79,7 @@ const SearchBar = ({ placeholder = 'Search professionals, skills, insights...', 
 
   return (
     <ClickAwayListener onClickAway={() => setIsOpen(false)}>
-      <Box sx={{ position: 'relative', width: '100%', maxWidth: 480, ...sx }}>
+      <Box sx={{ position: 'relative', width: '100%', maxWidth: 480, minWidth: 0, ...sx }}>
         <Paper
           elevation={0}
           sx={{
@@ -112,8 +112,9 @@ const SearchBar = ({ placeholder = 'Search professionals, skills, insights...', 
             }}
             fullWidth
             sx={{
+              minWidth: 0,
               fontSize: '0.9rem',
-              '& input': { py: 0.75 }
+              '& input': { minWidth: 0, py: 0.75 }
             }}
           />
           {loading && <CircularProgress size={16} sx={{ mr: 1, color: 'text.secondary' }} />}

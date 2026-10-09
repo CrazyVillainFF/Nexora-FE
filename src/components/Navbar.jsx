@@ -80,7 +80,7 @@ const Navbar = () => {
       }}
     >
       <Container maxWidth="xl">
-        <Toolbar disableGutters sx={{ minHeight: { xs: 60, md: 70 }, gap: { xs: 1, sm: 2 } }}>
+        <Toolbar disableGutters sx={{ minHeight: { xs: 60, md: 70 }, gap: { xs: 0.75, sm: 2 }, width: '100%', minWidth: 0 }}>
           {/* Brand Logo */}
           <Stack
             direction="row"
@@ -103,11 +103,11 @@ const Navbar = () => {
           </Stack>
 
           {/* Global Search Bar */}
-          <Box sx={{ flex: 1, maxWidth: { xs: '100%', sm: 380, md: 460 }, mx: { xs: 1, sm: 2 } }}>
+          <Box sx={{ flex: 1, minWidth: 0, maxWidth: { xs: '100%', sm: 380, md: 460 }, mx: { xs: 0, sm: 2 } }}>
             <SearchBar />
           </Box>
 
-          <Box sx={{ flexGrow: 1 }} />
+          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'block' } }} />
 
           {/* Desktop Nav Items */}
           {isAuthenticated ? (
@@ -169,14 +169,14 @@ const Navbar = () => {
 
           {/* Theme Switcher */}
           <Tooltip title={mode === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}>
-            <IconButton onClick={toggleTheme} color="inherit" sx={{ ml: 0.5 }}>
+            <IconButton onClick={toggleTheme} color="inherit" sx={{ ml: { xs: 0, sm: 0.5 }, flexShrink: 0 }}>
               {mode === 'light' ? <DarkModeOutlinedIcon fontSize="small" /> : <LightModeOutlinedIcon fontSize="small" />}
             </IconButton>
           </Tooltip>
 
           {/* User Profile Avatar / Menu */}
           {isAuthenticated && (
-            <Box sx={{ ml: 1 }}>
+            <Box sx={{ ml: { xs: 0, sm: 1 }, flexShrink: 0 }}>
               <IconButton onClick={handleOpenMenu} sx={{ p: 0.25 }}>
                 <Avatar
                   src={user?.profilePicture}
