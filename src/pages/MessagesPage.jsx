@@ -197,18 +197,49 @@ const MessagesPage = () => {
     event.preventDefault();
     const text = (composerInputRef.current?.value || draft).trim();
     if (!text || !active || sending) return;
+    const activeConversation = active;
+    const previousConversation = conversations.find((conversation) => conversation._id === activeConversation._id);
+    const temporaryId = `pending-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    const sentAt = new Date().toISOString();
+    const optimisticMessage = {
+      _id: temporaryId,
+      conversation: activeConversation._id,
+      sender: user._id,
+      text,
+      createdAt: sentAt,
+      readBy: [user._id],
+      pending: true,
+    };
+
+    // Render immediately; confirm or roll back the bubble after the server responds.
+    if (selectedConversationId.current === activeConversation._id) {
+      setMessages((existing) => [...existing, optimisticMessage]);
+    }
+    setDraft('');
+    if (composerInputRef.current) composerInputRef.current.value = '';
+    setConversations((existing) => [
+      { _id: activeConversation._id, peer: activeConversation.peer, lastMessageAt: sentAt, lastMessage: { sender: user._id, text, createdAt: sentAt } },
+      ...existing.filter((conversation) => conversation._id !== activeConversation._id)
+    ]);
     try {
       setSending(true);
       setError('');
-      const sentAt = new Date().toISOString();
-      await messageAPI.sendMessage(active._id, { text });
-      setDraft('');
-      setConversations((existing) => [
-        { _id: active._id, peer: active.peer, lastMessageAt: sentAt, lastMessage: { sender: user._id, text, createdAt: sentAt } },
-        ...existing.filter((conversation) => conversation._id !== active._id)
-      ]);
-      await loadMessages(active._id, privateKey, active.peer.encryptionSigningPublicKey);
+      const response = await messageAPI.sendMessage(activeConversation._id, { text });
+      const savedMessage = response.data.message;
+      if (selectedConversationId.current === activeConversation._id) setMessages((existing) => {
+        const withoutPendingOrDuplicate = existing.filter((message) => (
+          message._id !== temporaryId && String(message._id) !== String(savedMessage._id)
+        ));
+        return [...withoutPendingOrDuplicate, savedMessage];
+      });
     } catch (sendError) {
+      if (selectedConversationId.current === activeConversation._id) {
+        setMessages((existing) => existing.filter((message) => message._id !== temporaryId));
+      }
+      setConversations((existing) => previousConversation
+        ? [previousConversation, ...existing.filter((conversation) => conversation._id !== activeConversation._id)]
+        : existing.filter((conversation) => conversation._id !== activeConversation._id));
+      setDraft((current) => current ? `${text}\n${current}`.slice(0, 5000) : text);
       setError(sendError.message || 'The message could not be sent.');
     } finally {
       setSending(false);
@@ -392,7 +423,7 @@ const MessagesPage = () => {
                           <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>{message.text}</Typography>
                         </Paper>
                         <Typography variant="caption" color="text.secondary" sx={{ display: 'block', textAlign: ownMessage ? 'right' : 'left', mt: 0.4 }}>
-                          {formatTimestamp(message.createdAt)}{ownMessage ? ` · ${readByPeer ? 'Read' : 'Sent'}` : ''}
+                          {formatTimestamp(message.createdAt)}{ownMessage ? ` · ${message.pending ? 'Sending…' : readByPeer ? 'Read' : 'Sent'}` : ''}
                         </Typography>
                       </Box>
                     );
