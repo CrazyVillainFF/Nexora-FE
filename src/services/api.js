@@ -102,6 +102,7 @@ export const postAPI = {
 export const commentAPI = {
   addComment: (postId, data) => api.post(`/posts/${postId}/comments`, data),
   getPostComments: (postId) => api.get(`/posts/${postId}/comments`),
+  updateComment: (commentId, data) => api.put(`/comments/${commentId}`, data),
   deleteComment: (commentId) => api.delete(`/comments/${commentId}`),
 };
 

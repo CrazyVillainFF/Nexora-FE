@@ -29,6 +29,8 @@ import MoreVertRoundedIcon from '@mui/icons-material/MoreVertRounded';
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import SendRoundedIcon from '@mui/icons-material/SendRounded';
+import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
+import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import EmojiPickerControl from './EmojiPickerControl';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -47,6 +49,9 @@ const PostCard = ({ post, onPostDeleted, onPostUpdated }) => {
   const [newComment, setNewComment] = useState('');
   const [loadingComments, setLoadingComments] = useState(false);
   const [submittingComment, setSubmittingComment] = useState(false);
+  const [editingCommentId, setEditingCommentId] = useState(null);
+  const [editingCommentText, setEditingCommentText] = useState('');
+  const [savingComment, setSavingComment] = useState(false);
 
   // Edit post state
   const [isEditing, setIsEditing] = useState(false);
@@ -143,6 +148,35 @@ const PostCard = ({ post, onPostDeleted, onPostUpdated }) => {
       }
     } catch (err) {
       console.error('[Delete Comment Error]', err.message);
+    }
+  };
+
+  const startEditingComment = (comment) => {
+    setEditingCommentId(comment._id);
+    setEditingCommentText(comment.content || '');
+  };
+
+  const handleUpdateComment = async (event) => {
+    event.preventDefault();
+    const content = editingCommentText.trim();
+    if (!content || !editingCommentId || savingComment) return;
+    try {
+      setSavingComment(true);
+      const response = await commentAPI.updateComment(editingCommentId, { content });
+      if (response.data.success) {
+        setComments((existing) => existing.map((comment) => (
+          comment._id === editingCommentId ? { ...comment, ...response.data.comment, content } : comment
+        )));
+        setEditingCommentId(null);
+        setEditingCommentText('');
+        setToastSeverity('success');
+        setToastMessage('Comment updated.');
+      }
+    } catch (error) {
+      setToastSeverity('error');
+      setToastMessage(error.message || 'Could not update your comment. Please try again.');
+    } finally {
+      setSavingComment(false);
     }
   };
 
@@ -482,6 +516,8 @@ const PostCard = ({ post, onPostDeleted, onPostUpdated }) => {
                   const isCommentOwner =
                     currentUser &&
                     (currentUser._id === commentAuthor._id || currentUser._id === author._id);
+                  const isCommentAuthor = currentUser && currentUser._id === commentAuthor._id;
+                  const isEditingThisComment = editingCommentId === comment._id;
 
                   return (
                     <Stack key={comment._id} direction="row" spacing={1.5} alignItems="flex-start">
@@ -516,9 +552,22 @@ const PostCard = ({ post, onPostDeleted, onPostUpdated }) => {
                             <Typography variant="caption" color="text.disabled" sx={{ fontSize: '0.7rem' }}>
                               {formatTimeAgo(comment.createdAt)}
                             </Typography>
-                            {isCommentOwner && (
+                            {isCommentAuthor && !isEditingThisComment && (
                               <IconButton
                                 size="small"
+                                aria-label="Edit comment"
+                                title="Edit comment"
+                                onClick={() => startEditingComment(comment)}
+                                sx={{ p: 0.25, color: 'text.secondary', '&:hover': { color: 'primary.main' } }}
+                              >
+                                <EditOutlinedIcon sx={{ fontSize: 14 }} />
+                              </IconButton>
+                            )}
+                            {isCommentOwner && !isEditingThisComment && (
+                              <IconButton
+                                size="small"
+                                aria-label="Delete comment"
+                                title="Delete comment"
                                 onClick={() => handleDeleteComment(comment._id)}
                                 sx={{ p: 0.25, color: 'text.disabled', '&:hover': { color: 'error.main' } }}
                               >
@@ -527,9 +576,30 @@ const PostCard = ({ post, onPostDeleted, onPostUpdated }) => {
                             )}
                           </Stack>
                         </Stack>
-                        <Typography variant="body2" sx={{ mt: 0.5, fontSize: '0.875rem', overflowWrap: 'anywhere' }}>
-                          {comment.content}
-                        </Typography>
+                        {isEditingThisComment ? (
+                          <Box component="form" onSubmit={handleUpdateComment} sx={{ mt: 1 }}>
+                            <TextField
+                              autoFocus
+                              fullWidth
+                              multiline
+                              minRows={1}
+                              maxRows={4}
+                              size="small"
+                              value={editingCommentText}
+                              onChange={(event) => setEditingCommentText(event.target.value.slice(0, 1000))}
+                              inputProps={{ maxLength: 1000, 'aria-label': 'Edit comment text' }}
+                              disabled={savingComment}
+                            />
+                            <Stack direction="row" justifyContent="flex-end" spacing={0.5} sx={{ mt: 0.5 }}>
+                              <Button size="small" startIcon={<CloseRoundedIcon />} onClick={() => setEditingCommentId(null)} disabled={savingComment}>Cancel</Button>
+                              <Button size="small" type="submit" variant="contained" startIcon={savingComment ? <CircularProgress size={14} color="inherit" /> : <CheckRoundedIcon />} disabled={!editingCommentText.trim() || savingComment}>Save</Button>
+                            </Stack>
+                          </Box>
+                        ) : (
+                          <Typography variant="body2" sx={{ mt: 0.5, fontSize: '0.875rem', overflowWrap: 'anywhere' }}>
+                            {comment.content}
+                          </Typography>
+                        )}
                       </Box>
                     </Stack>
                   );
