@@ -102,7 +102,14 @@ const SignInPage = () => {
                 ),
                 endAdornment: (
                   <InputAdornment position="end">
-                    <IconButton onClick={() => setShowPassword(!showPassword)} edge="end" size="small">
+                    <IconButton
+                      type="button"
+                      onClick={() => setShowPassword((visible) => !visible)}
+                      edge="end"
+                      size="small"
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
+                      title={showPassword ? 'Hide password' : 'Show password'}
+                    >
                       {showPassword ? <VisibilityOffOutlinedIcon fontSize="small" /> : <VisibilityOutlinedIcon fontSize="small" />}
                     </IconButton>
                   </InputAdornment>

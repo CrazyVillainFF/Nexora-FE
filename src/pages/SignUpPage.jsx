@@ -40,6 +40,7 @@ const SignUpPage = () => {
     confirmPassword: '',
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
 
@@ -266,7 +267,14 @@ const SignUpPage = () => {
                 ),
                 endAdornment: (
                   <InputAdornment position="end">
-                    <IconButton onClick={() => setShowPassword(!showPassword)} edge="end" size="small">
+                    <IconButton
+                      type="button"
+                      onClick={() => setShowPassword((visible) => !visible)}
+                      edge="end"
+                      size="small"
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
+                      title={showPassword ? 'Hide password' : 'Show password'}
+                    >
                       {showPassword ? <VisibilityOffOutlinedIcon fontSize="small" /> : <VisibilityOutlinedIcon fontSize="small" />}
                     </IconButton>
                   </InputAdornment>
@@ -277,7 +285,7 @@ const SignUpPage = () => {
             <TextField
               label="Confirm Password"
               name="confirmPassword"
-              type={showPassword ? 'text' : 'password'}
+              type={showConfirmPassword ? 'text' : 'password'}
               fullWidth
               value={formData.confirmPassword}
               onChange={handleChange}
@@ -286,6 +294,20 @@ const SignUpPage = () => {
                 startAdornment: (
                   <InputAdornment position="start">
                     <LockOutlinedIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                  </InputAdornment>
+                ),
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      type="button"
+                      onClick={() => setShowConfirmPassword((visible) => !visible)}
+                      edge="end"
+                      size="small"
+                      aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
+                      title={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
+                    >
+                      {showConfirmPassword ? <VisibilityOffOutlinedIcon fontSize="small" /> : <VisibilityOutlinedIcon fontSize="small" />}
+                    </IconButton>
                   </InputAdornment>
                 ),
               }}
