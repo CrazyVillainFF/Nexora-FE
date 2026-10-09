@@ -51,6 +51,8 @@ const MessagesPage = () => {
   const searchRef = useRef(null);
   const composerInputRef = useRef(null);
   const legacySyncsRef = useRef(new Set());
+  const legacyTextCacheRef = useRef(new Map());
+  const legacyDecryptPromisesRef = useRef(new Map());
   const selectedConversationId = useRef(null);
   const messageRequestId = useRef(0);
   const openRequestId = useRef(0);
@@ -60,24 +62,48 @@ const MessagesPage = () => {
     const requestId = ++messageRequestId.current;
     try {
       const response = await messageAPI.getMessages(conversationId);
+      const fetchedMessages = response.data.messages || [];
+      if (requestId !== messageRequestId.current || selectedConversationId.current !== conversationId) return;
+      const legacyMessages = fetchedMessages.filter((message) => (
+        typeof message.text !== 'string' && !legacyTextCacheRef.current.has(String(message._id))
+      ));
+      setMessages(fetchedMessages.map((message) => (
+        typeof message.text === 'string'
+          ? { ...message, decryptError: false }
+          : legacyTextCacheRef.current.has(String(message._id))
+            ? { ...message, text: legacyTextCacheRef.current.get(String(message._id)), decryptError: false }
+          : { ...message, text: key ? 'Decrypting older message…' : 'This older encrypted message is only available on the device where it was created.', decryptError: !key, pendingDecryption: Boolean(key) }
+      )));
+      setLoadingMessages(false);
+      if (!key || legacyMessages.length === 0) return;
+
       const legacyToSync = [];
-      const decrypted = await Promise.all((response.data.messages || []).map(async (message) => {
-        try {
+      const decryptedLegacy = await Promise.all(legacyMessages.map(async (message) => {
+        const messageId = String(message._id);
+        let decryptPromise = legacyDecryptPromisesRef.current.get(messageId);
+        if (!decryptPromise) {
           const senderSigningKey = message.sender.toString() === userId.toString()
             ? ownSigningPublicKey
             : peerSigningPublicKey;
-          if (typeof message.text === 'string') return { ...message, decryptError: false };
-          if (!key) return { ...message, text: 'This older encrypted message is only available on the device where it was created.', decryptError: true };
-          const text = await decryptMessage(message, userId, key, senderSigningKey);
-          legacyToSync.push({ id: message._id, text });
-          return { ...message, text, decryptError: false };
-        } catch {
-          return { ...message, text: 'Unable to decrypt on this device.', decryptError: true };
+          decryptPromise = decryptMessage(message, userId, key, senderSigningKey)
+            .then((text) => {
+              legacyTextCacheRef.current.set(messageId, text);
+              return { text, decryptError: false };
+            })
+            .catch(() => ({ text: 'Unable to decrypt on this device.', decryptError: true }))
+            .finally(() => legacyDecryptPromisesRef.current.delete(messageId));
+          legacyDecryptPromisesRef.current.set(messageId, decryptPromise);
         }
+        const result = await decryptPromise;
+        if (!result.decryptError) legacyToSync.push({ id: message._id, text: result.text });
+        return { id: message._id, ...result, pendingDecryption: false };
       }));
       if (requestId !== messageRequestId.current || selectedConversationId.current !== conversationId) return;
-      setMessages(decrypted);
-      setLoadingMessages(false);
+      const decryptedById = new Map(decryptedLegacy.map((message) => [String(message.id), message]));
+      setMessages((existing) => existing.map((message) => {
+        const decryptedMessage = decryptedById.get(String(message._id));
+        return decryptedMessage ? { ...message, ...decryptedMessage } : message;
+      }));
       const unsynced = legacyToSync.filter(({ id }) => !legacySyncsRef.current.has(String(id)));
       if (unsynced.length) {
         unsynced.forEach(({ id }) => legacySyncsRef.current.add(String(id)));
@@ -173,6 +199,17 @@ const MessagesPage = () => {
 
   const openConversation = useCallback(async (contact) => {
     const requestId = ++openRequestId.current;
+    const cachedConversation = conversations.find((conversation) => String(conversation.peer?._id) === String(contact._id));
+    if (cachedConversation) {
+      if (String(active?._id) === String(cachedConversation._id)) return;
+      setError('');
+      messageRequestId.current += 1;
+      selectedConversationId.current = cachedConversation._id;
+      setMessages([]);
+      setLoadingMessages(true);
+      setActive({ ...cachedConversation, peer: { ...contact, ...cachedConversation.peer } });
+      return;
+    }
     try {
       setError('');
       selectedConversationId.current = null;
@@ -191,7 +228,7 @@ const MessagesPage = () => {
       if (requestId !== openRequestId.current) return;
       setError(openError.message || 'Could not open this conversation.');
     }
-  }, []);
+  }, [active?._id, conversations]);
 
   const sendMessage = async (event) => {
     event.preventDefault();
