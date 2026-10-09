@@ -46,6 +46,10 @@ const MobileBottomNav = () => {
             ? 'rgba(255, 255, 255, 0.94)'
             : 'rgba(17, 24, 39, 0.94)',
           paddingBottom: 'env(safe-area-inset-bottom)',
+          width: '100%',
+          maxWidth: '100vw',
+          boxSizing: 'border-box',
+          overflow: 'hidden',
         }}
         elevation={8}
       >
@@ -60,10 +64,24 @@ const MobileBottomNav = () => {
             navigate(value);
           }}
           sx={{
-            height: 62,
+            height: 64,
+            width: '100%',
+            minWidth: 0,
             bgcolor: 'transparent',
-            '& .MuiBottomNavigationAction-root': { minWidth: 0, maxWidth: 'none', px: 0.25 },
-            '& .MuiBottomNavigationAction-label': { fontSize: '0.64rem', whiteSpace: 'nowrap' },
+            '& .MuiBottomNavigationAction-root': {
+              flex: '1 1 20%',
+              minWidth: 0,
+              maxWidth: '20%',
+              px: 0,
+              overflow: 'hidden',
+            },
+            '& .MuiBottomNavigationAction-label': {
+              fontSize: 'clamp(0.58rem, 2.5vw, 0.68rem)',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'clip',
+            },
+            '& .MuiBottomNavigationAction-root .MuiSvgIcon-root': { fontSize: 22 },
             '& .Mui-selected': { color: 'primary.main', fontWeight: 700 },
           }}
         >
