@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import VerifiedRoundedIcon from '@mui/icons-material/VerifiedRounded';
 import PeopleOutlineRoundedIcon from '@mui/icons-material/PeopleOutlineRounded';
+import { isVerifiedAccount } from '../utils/verification';
 
 const ProfileMiniCard = () => {
   const { user } = useAuth();
@@ -56,7 +57,7 @@ const ProfileMiniCard = () => {
           >
             {user.name}
           </Typography>
-          <VerifiedRoundedIcon sx={{ fontSize: 16, color: 'primary.main' }} />
+          {isVerifiedAccount(user) && <VerifiedRoundedIcon sx={{ fontSize: 16, color: 'primary.main' }} />}
         </Stack>
 
         <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.825rem', mt: 0.5 }} noWrap>

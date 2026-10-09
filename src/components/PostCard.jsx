@@ -29,6 +29,7 @@ import MoreVertRoundedIcon from '@mui/icons-material/MoreVertRounded';
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import SendRoundedIcon from '@mui/icons-material/SendRounded';
+import EmojiPickerControl from './EmojiPickerControl';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { postAPI, commentAPI } from '../services/api';
@@ -435,7 +436,7 @@ const PostCard = ({ post, onPostDeleted, onPostUpdated }) => {
                 >
                   {currentUser?.name ? currentUser.name[0] : 'U'}
                 </Avatar>
-                <Box component="form" onSubmit={handleAddComment} sx={{ flex: 1, minWidth: 0 }}>
+                <Box component="form" onSubmit={handleAddComment} sx={{ flex: 1, minWidth: 0, display: 'flex', gap: 0.5, alignItems: 'center' }}>
                   <TextField
                     fullWidth
                     size="small"
@@ -443,21 +444,22 @@ const PostCard = ({ post, onPostDeleted, onPostUpdated }) => {
                     value={newComment}
                     onChange={(e) => setNewComment(e.target.value)}
                     disabled={submittingComment}
-                    InputProps={{
-                      endAdornment: (
-                        <IconButton
-                          size="small"
-                          color="primary"
-                          type="submit"
-                          aria-label="Post comment"
-                          disabled={!newComment.trim() || submittingComment}
-                        >
-                          {submittingComment ? <CircularProgress size={16} /> : <SendRoundedIcon fontSize="small" />}
-                        </IconButton>
-                      ),
-                      sx: { bgcolor: 'background.paper', borderRadius: 3 }
-                    }}
+                    sx={{ flex: 1, minWidth: 0, '& .MuiOutlinedInput-root': { bgcolor: 'background.paper', borderRadius: 3 } }}
                   />
+                  <EmojiPickerControl
+                    disabled={submittingComment}
+                    onSelect={(emoji) => setNewComment((comment) => `${comment}${emoji}`)}
+                  />
+                  <IconButton
+                    size="small"
+                    color="primary"
+                    type="submit"
+                    aria-label="Post comment"
+                    disabled={!newComment.trim() || submittingComment}
+                    sx={{ width: 36, height: 36, flexShrink: 0 }}
+                  >
+                    {submittingComment ? <CircularProgress size={16} /> : <SendRoundedIcon fontSize="small" />}
+                  </IconButton>
                 </Box>
               </Stack>
             ) : (

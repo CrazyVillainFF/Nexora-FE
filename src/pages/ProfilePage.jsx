@@ -17,6 +17,7 @@ import {
 } from '@mui/material';
 import { useParams, useNavigate } from 'react-router-dom';
 import VerifiedRoundedIcon from '@mui/icons-material/VerifiedRounded';
+import { isVerifiedAccount } from '../utils/verification';
 import PlaceOutlinedIcon from '@mui/icons-material/PlaceOutlined';
 import BusinessCenterOutlinedIcon from '@mui/icons-material/BusinessCenterOutlined';
 import LanguageOutlinedIcon from '@mui/icons-material/LanguageOutlined';
@@ -281,7 +282,7 @@ const ProfilePage = () => {
               <Typography variant="h4" fontWeight={800} letterSpacing="-0.02em">
                 {isOwnProfile ? `${profile.name} (Owner)` : profile.name}
               </Typography>
-              <VerifiedRoundedIcon sx={{ fontSize: 24, color: 'primary.main' }} />
+              {isVerifiedAccount(profile) && <VerifiedRoundedIcon sx={{ fontSize: 24, color: 'primary.main' }} />}
             </Stack>
 
             <Typography variant="h6" color="text.secondary" fontWeight={500} sx={{ mt: 0.5, maxWidth: 720 }}>

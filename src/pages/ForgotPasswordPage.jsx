@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Alert, Box, Button, Card, CardContent, CircularProgress, Stack, TextField, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { authAPI } from '../services/api';
+import PasswordTextField from '../components/PasswordTextField';
 
 const ForgotPasswordPage = () => {
   const [email, setEmail] = useState('');
@@ -87,8 +88,8 @@ const ForgotPasswordPage = () => {
         {step === 'password' && (
           <Box component="form" onSubmit={savePassword}>
             <Stack spacing={2}>
-              <TextField label="New password" type="password" value={newPassword} onChange={(event) => setNewPassword(event.target.value)} required fullWidth autoComplete="new-password" inputProps={{ minLength: 8, maxLength: 128 }} />
-              <TextField label="Confirm new password" type="password" value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} required fullWidth autoComplete="new-password" inputProps={{ minLength: 8, maxLength: 128 }} />
+              <PasswordTextField label="New password" value={newPassword} onChange={(event) => setNewPassword(event.target.value)} required fullWidth autoComplete="new-password" inputProps={{ minLength: 8, maxLength: 128 }} />
+              <PasswordTextField label="Confirm new password" value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} required fullWidth autoComplete="new-password" inputProps={{ minLength: 8, maxLength: 128 }} />
               <Button type="submit" variant="contained" disabled={busy || newPassword.length < 8 || newPassword !== confirmPassword}>{busy ? <CircularProgress size={22} color="inherit" /> : 'Save new password'}</Button>
             </Stack>
           </Box>

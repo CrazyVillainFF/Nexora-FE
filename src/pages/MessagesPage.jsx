@@ -9,6 +9,7 @@ import SendRoundedIcon from '@mui/icons-material/SendRounded';
 import ChatBubbleOutlineRoundedIcon from '@mui/icons-material/ChatBubbleOutlineRounded';
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
 import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded';
+import EmojiPickerControl from '../components/EmojiPickerControl';
 import { useTheme } from '@mui/material/styles';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -40,6 +41,7 @@ const MessagesPage = () => {
   const [draft, setDraft] = useState('');
   const [privateKey, setPrivateKey] = useState(null);
   const [ownSigningPublicKey, setOwnSigningPublicKey] = useState('');
+  const [backupPrompt, setBackupPrompt] = useState('');
   const [loading, setLoading] = useState(true);
   const [loadingMessages, setLoadingMessages] = useState(true);
   const [sending, setSending] = useState(false);
@@ -106,14 +108,26 @@ const MessagesPage = () => {
         setConversations(conversationResponse.data.conversations || []);
 
         // Try the old local key only to display legacy encrypted history. New chats do not use it.
+        let devicePairForPrompt = null;
         try {
           const devicePair = await getDeviceKeyPair(user._id);
+          devicePairForPrompt = devicePair;
           if (!cancelled && devicePair) {
             setPrivateKey(devicePair.privateKey);
             setOwnSigningPublicKey(devicePair.serializedSigningPublicKey);
           }
         } catch {
           // Account-synced chats remain usable even when this browser has no local legacy key store.
+        }
+        try {
+          const backupResponse = await messageAPI.getOwnKeyBackups();
+          if (!cancelled) {
+            const hasBackup = (backupResponse.data.backups || []).length > 0;
+            const canCreateBackup = Boolean(devicePairForPrompt?.privateKey?.extractable && devicePairForPrompt?.signingPrivateKey?.extractable);
+            setBackupPrompt(hasBackup && !devicePairForPrompt ? 'restore' : canCreateBackup && !hasBackup ? 'save' : '');
+          }
+        } catch {
+          // The chat remains available even if backup status cannot be checked.
         }
       } catch (initializationError) {
         if (!cancelled) {
@@ -245,6 +259,13 @@ const MessagesPage = () => {
       </Stack>
 
       {error && <Alert severity="warning" sx={{ mb: 2 }}>{error}</Alert>}
+      {backupPrompt && (
+        <Alert
+          severity="info"
+          sx={{ mb: 1.5, py: 0, alignItems: 'center', '& .MuiAlert-message': { py: 0.75 } }}
+          action={<Button color="inherit" size="small" onClick={() => navigate('/settings#message-backup')}>Setup</Button>}
+        >{backupPrompt === 'restore' ? 'Restore your saved recovery backup for older encrypted messages in Settings.' : 'Save a recovery backup for older encrypted messages in Settings.'}</Alert>
+      )}
       <Paper
         variant="outlined"
         sx={{
@@ -379,8 +400,13 @@ const MessagesPage = () => {
                   <div ref={bottomRef} />
                 </Box>
                 <Box component="form" onSubmit={sendMessage} sx={{ p: { xs: 1, sm: 1.5 }, pb: 'max(12px, env(safe-area-inset-bottom))', borderTop: 1, borderColor: 'divider', display: 'flex', gap: 1, alignItems: 'flex-end', bgcolor: 'background.paper' }}>
+                  <EmojiPickerControl
+                    disabled={sending}
+                    onSelect={(emoji) => setDraft((current) => `${current}${emoji}`.slice(0, 5000))}
+                  />
                   <TextField
                     fullWidth multiline maxRows={4} size="small" label="Message" value={draft}
+                    sx={{ flex: 1, minWidth: 0 }}
                     inputRef={composerInputRef}
                     onChange={(event) => setDraft(event.target.value.slice(0, 5000))}
                     onInput={(event) => setDraft(event.currentTarget.value.slice(0, 5000))}
