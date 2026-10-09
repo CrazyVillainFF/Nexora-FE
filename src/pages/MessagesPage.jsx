@@ -20,6 +20,7 @@ import { messageAPI } from '../services/api';
 import { useNotifications } from '../context/NotificationContext';
 import { decryptMessage, getDeviceKeyPair } from '../utils/e2ee';
 import { sortContactsByRecentConversations } from '../utils/messageInbox';
+import { getBrandedHeadline } from '../utils/brandCopy';
 
 const formatTimestamp = (value) => new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit' }).format(new Date(value));
 const formatConversationTime = (value) => {
@@ -480,7 +481,7 @@ const MessagesPage = () => {
             <Stack direction="row" spacing={1.25} alignItems="center" sx={{ px: 2, py: 1.75 }}>
               <Avatar src={user?.profilePicture} alt="" sx={{ width: 38, height: 38 }}>{user?.name?.[0] || 'N'}</Avatar>
               <Box sx={{ minWidth: 0, flex: 1 }}>
-                <Typography fontWeight={750} noWrap>{user?.name || 'Nexora'}</Typography>
+                <Typography fontWeight={750} noWrap>{user?.name || 'Vuprise'}</Typography>
                 <Typography variant="caption" color="text.secondary">Messages</Typography>
               </Box>
               <IconButton aria-label="Find a connection to message" onClick={() => searchRef.current?.focus()}>
@@ -516,7 +517,7 @@ const MessagesPage = () => {
                     const isOwnLastMessage = String(conversation?.lastMessage?.sender) === String(user?._id);
                     const preview = hasMessages
                       ? (conversation.lastMessage.text || (isOwnLastMessage ? 'You sent a message' : 'Message'))
-                      : (contact.headline || 'Start a conversation');
+                      : (getBrandedHeadline(contact.headline) || 'Start a conversation');
                     return (
                       <ListItem
                         key={contact._id}
@@ -557,7 +558,7 @@ const MessagesPage = () => {
                       >
                         <ListItemAvatar sx={{ minWidth: 62 }}><Avatar src={contact.profilePicture} alt="" sx={{ width: 50, height: 50 }}>{contact.name?.[0] || 'N'}</Avatar></ListItemAvatar>
                         <ListItemText
-                          primary={conversation?.displayName || contact.name || 'Nexora member'}
+                          primary={conversation?.displayName || contact.name || 'Vuprise member'}
                           secondary={preview}
                           primaryTypographyProps={{ noWrap: true, fontWeight: 650 }}
                           secondaryTypographyProps={{ noWrap: true, fontSize: '0.78rem', color: 'text.secondary' }}
@@ -591,7 +592,7 @@ const MessagesPage = () => {
                   <Avatar src={active.peer.profilePicture} alt="" sx={{ width: 42, height: 42 }}>{active.peer.name?.[0] || 'N'}</Avatar>
                   <Box sx={{ minWidth: 0, flex: 1 }}>
                     <Typography variant="subtitle1" fontWeight={700} noWrap>{active.displayName || active.peer.name}</Typography>
-                    <Typography variant="caption" color="text.secondary" noWrap>{active.peer.headline || 'Nexora connection'}</Typography>
+                    <Typography variant="caption" color="text.secondary" noWrap>{getBrandedHeadline(active.peer.headline) || 'Vuprise connection'}</Typography>
                   </Box>
                   <Typography variant="caption" color="text.secondary" sx={{ flexShrink: 0, display: { xs: 'none', sm: 'block' } }}>Synced to your account</Typography>
                 </Stack>
@@ -601,7 +602,7 @@ const MessagesPage = () => {
                     <Stack alignItems="center" justifyContent="center" sx={{ flex: 1, py: 5, textAlign: 'center' }}>
                       <Avatar src={active.peer.profilePicture} alt="" sx={{ width: 72, height: 72, mb: 1.5 }}>{active.peer.name?.[0] || 'N'}</Avatar>
                       <Typography variant="h6" fontWeight={700}>{active.peer.name}</Typography>
-                      <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, maxWidth: 320 }}>Start a private conversation with your Nexora connection.</Typography>
+                      <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, maxWidth: 320 }}>Start a private conversation with your Vuprise connection.</Typography>
                     </Stack>
                   )}
                   {messages.map((message) => {

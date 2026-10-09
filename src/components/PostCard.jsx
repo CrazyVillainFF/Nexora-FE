@@ -22,6 +22,7 @@ import {
   Alert
 } from '@mui/material';
 import FavoriteBorderRoundedIcon from '@mui/icons-material/FavoriteBorderRounded';
+import { getBrandedHeadline } from '../utils/brandCopy';
 import FavoriteRoundedIcon from '@mui/icons-material/FavoriteRounded';
 import ChatBubbleOutlineRoundedIcon from '@mui/icons-material/ChatBubbleOutlineRounded';
 import ShareOutlinedIcon from '@mui/icons-material/ShareOutlined';
@@ -279,13 +280,13 @@ const PostCard = ({ post, onPostDeleted, onPostUpdated }) => {
               sx={{ cursor: 'pointer', '&:hover': { color: 'primary.main' } }}
               onClick={() => navigate(`/profile/${author._id}`)}
             >
-              {author.name || 'Nexora member'}
+              {author.name || 'Vuprise member'}
             </Typography>
           }
           subheader={
             <Stack spacing={0.25}>
               <Typography variant="caption" color="text.secondary" noWrap>
-                {author.headline || author.jobTitle || 'Professional'}
+                {getBrandedHeadline(author.headline) || author.jobTitle || 'Professional'}
               </Typography>
               <Typography variant="caption" color="text.disabled" sx={{ fontSize: '0.75rem' }}>
                 {formatTimeAgo(post.createdAt)}

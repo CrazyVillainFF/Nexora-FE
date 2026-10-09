@@ -26,6 +26,7 @@ import SaveRoundedIcon from '@mui/icons-material/SaveRounded';
 import CountryRegionSelector from '../components/CountryRegionSelector';
 
 import { useAuth } from '../context/AuthContext';
+import { getBrandedHeadline } from '../utils/brandCopy';
 import { userAPI } from '../services/api';
 
 const EditProfilePage = () => {
@@ -57,7 +58,7 @@ const EditProfilePage = () => {
     if (user) {
       setFormData({
         name: user.name || '',
-        headline: user.headline || '',
+        headline: getBrandedHeadline(user.headline),
         bio: user.bio || '',
         location: user.location || '',
         website: user.website || '',

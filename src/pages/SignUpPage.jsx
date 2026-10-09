@@ -123,7 +123,7 @@ const SignUpPage = () => {
       <CardContent sx={{ p: '0 !important' }}>
         <Box sx={{ mb: 3 }}>
           <Typography variant="h5" fontWeight={800} gutterBottom>
-            Join Nexora
+            Join Vuprise
           </Typography>
           <Typography variant="body2" color="text.secondary">
             Connect with leading founders, architects, and designers worldwide.

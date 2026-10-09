@@ -18,6 +18,7 @@ import {
 import { useParams, useNavigate } from 'react-router-dom';
 import VerifiedRoundedIcon from '@mui/icons-material/VerifiedRounded';
 import { isVerifiedAccount } from '../utils/verification';
+import { getBrandedHeadline } from '../utils/brandCopy';
 import PlaceOutlinedIcon from '@mui/icons-material/PlaceOutlined';
 import BusinessCenterOutlinedIcon from '@mui/icons-material/BusinessCenterOutlined';
 import LanguageOutlinedIcon from '@mui/icons-material/LanguageOutlined';
@@ -128,7 +129,7 @@ const ProfilePage = () => {
     const url = `${window.location.origin}/profile/${profile?._id || profileUserId}`;
     try {
       if (navigator.share) {
-        await navigator.share({ title: `${profile.name} on Nexora`, url });
+        await navigator.share({ title: `${profile.name} on Vuprise`, url });
         setToastSeverity('success');
         setToastMessage('Profile link shared.');
       } else if (navigator.clipboard?.writeText) {
@@ -159,7 +160,7 @@ const ProfilePage = () => {
       <Container maxWidth="md" sx={{ py: 6 }}>
         <ErrorState
           title="Profile Not Found"
-          message={error || 'We could not locate this profile on Nexora.'}
+          message={error || 'We could not locate this profile on Vuprise.'}
           onRetry={() => navigate('/home')}
         />
       </Container>
@@ -286,7 +287,7 @@ const ProfilePage = () => {
             </Stack>
 
             <Typography variant="h6" color="text.secondary" fontWeight={500} sx={{ mt: 0.5, maxWidth: 720 }}>
-              {profile.headline || 'Professional at Nexora'}
+              {getBrandedHeadline(profile.headline) || 'Professional at Vuprise'}
             </Typography>
 
             {/* Metadata Chips: Location, Company, Website */}

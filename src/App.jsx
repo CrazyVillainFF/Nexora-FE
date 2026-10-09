@@ -65,7 +65,7 @@ const RootRedirect = () => {
   if (loading) {
     return (
       <Box sx={{ minHeight: '55dvh', display: 'grid', placeItems: 'center' }}>
-        <CircularProgress aria-label="Loading Nexora" />
+        <CircularProgress aria-label="Loading Vuprise" />
       </Box>
     );
   }

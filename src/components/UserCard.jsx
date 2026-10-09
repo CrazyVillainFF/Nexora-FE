@@ -6,6 +6,7 @@ import VerifiedRoundedIcon from '@mui/icons-material/VerifiedRounded';
 import BusinessCenterOutlinedIcon from '@mui/icons-material/BusinessCenterOutlined';
 import PlaceOutlinedIcon from '@mui/icons-material/PlaceOutlined';
 import { isVerifiedAccount } from '../utils/verification';
+import { getBrandedHeadline } from '../utils/brandCopy';
 
 const UserCard = ({ user, onConnectionChanged }) => {
   const navigate = useNavigate();
@@ -81,7 +82,7 @@ const UserCard = ({ user, onConnectionChanged }) => {
             mb: 1
           }}
         >
-          {user.headline || user.jobTitle || 'Professional at Nexora'}
+          {getBrandedHeadline(user.headline) || user.jobTitle || 'Professional at Vuprise'}
         </Typography>
 
         {/* Company & Location Tags */}

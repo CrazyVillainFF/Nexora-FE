@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import VerifiedRoundedIcon from '@mui/icons-material/VerifiedRounded';
 import PeopleOutlineRoundedIcon from '@mui/icons-material/PeopleOutlineRounded';
 import { isVerifiedAccount } from '../utils/verification';
+import { getBrandedHeadline } from '../utils/brandCopy';
 
 const ProfileMiniCard = () => {
   const { user } = useAuth();
@@ -61,7 +62,7 @@ const ProfileMiniCard = () => {
         </Stack>
 
         <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.825rem', mt: 0.5 }} noWrap>
-          {user.headline || 'Professional at Nexora'}
+          {getBrandedHeadline(user.headline) || 'Professional at Vuprise'}
         </Typography>
 
         {user.location && (

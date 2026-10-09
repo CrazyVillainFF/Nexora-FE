@@ -26,6 +26,7 @@ import UserCard from '../components/UserCard';
 import { UserCardSkeleton } from '../components/LoadingSkeleton';
 import EmptyState from '../components/EmptyState';
 import ErrorState from '../components/ErrorState';
+import { getBrandedHeadline } from '../utils/brandCopy';
 
 const SKILL_FILTERS = ['All', 'Design Systems', 'Distributed Systems', 'Deep Learning', 'Robotics', 'Fintech', 'Go', 'Rust', 'Figma'];
 
@@ -302,7 +303,7 @@ const PeoplePage = () => {
                               {sender.name}
                             </Typography>
                             <Typography variant="body2" color="text.secondary">
-                              {sender.headline || sender.company || 'Professional at Nexora'}
+                              {getBrandedHeadline(sender.headline) || sender.company || 'Professional at Vuprise'}
                             </Typography>
                             {sender.location && (
                               <Typography variant="caption" color="text.secondary">

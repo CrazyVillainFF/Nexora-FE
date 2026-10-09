@@ -9,7 +9,7 @@ const ReactableMark = ({ size = 38, electric = false, interactive = false, symbo
   return (
     <Box
       role="img"
-      aria-label="Nexora"
+      aria-label="Vuprise"
       sx={{
         position: 'relative',
         width: size,

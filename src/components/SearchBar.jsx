@@ -16,6 +16,7 @@ import {
 } from '@mui/material';
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
 import ClearRoundedIcon from '@mui/icons-material/ClearRounded';
+import { getBrandedHeadline } from '../utils/brandCopy';
 import PersonOutlineRoundedIcon from '@mui/icons-material/PersonOutlineRounded';
 import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined';
 import { useNavigate } from 'react-router-dom';
@@ -174,7 +175,7 @@ const SearchBar = ({ placeholder = 'Search professionals, skills, insights...', 
                           }
                           secondary={
                             <Typography variant="caption" color="text.secondary" noWrap display="block">
-                              {u.headline || u.jobTitle || 'Professional at Nexora'}
+                              {getBrandedHeadline(u.headline) || u.jobTitle || 'Professional at Vuprise'}
                             </Typography>
                           }
                         />

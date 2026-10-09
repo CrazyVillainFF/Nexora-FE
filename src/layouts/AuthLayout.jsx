@@ -40,7 +40,7 @@ const AuthLayout = () => {
               >
                 <ReactableMark size={44} />
                 <Typography variant="h4" fontWeight={800} letterSpacing="-0.03em">
-                  Nexora
+                  Vuprise
                 </Typography>
               </Stack>
 

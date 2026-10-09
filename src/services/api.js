@@ -13,7 +13,7 @@ const api = axios.create({
 // Request Interceptor: Attach JWT Token
 api.interceptors.request.use(
   (config) => {
-    console.log(`[NEXORA API] ${config.method?.toUpperCase()} -> ${config.baseURL}${config.url}`);
+    console.log(`[VUPRISE API] ${config.method?.toUpperCase()} -> ${config.baseURL}${config.url}`);
     const token = localStorage.getItem('nexora_token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -38,7 +38,7 @@ api.interceptors.response.use(
       }
     }
 
-    console.error('[NEXORA API Error]', error.config?.url, error.response?.status, error.message);
+    console.error('[VUPRISE API Error]', error.config?.url, error.response?.status, error.message);
     const message =
       error.response?.data?.message ||
       error.message ||

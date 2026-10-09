@@ -17,6 +17,7 @@ import {
   useMediaQuery
 } from '@mui/material';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
+import { getBrandedHeadline } from '../utils/brandCopy';
 import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
 import ChatBubbleOutlineRoundedIcon from '@mui/icons-material/ChatBubbleOutlineRounded';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
@@ -89,7 +90,7 @@ const Navbar = () => {
             to={isAuthenticated ? '/home' : '/'}
             direction="row"
             spacing={1.25}
-            aria-label="Nexora home"
+            aria-label="Vuprise home"
             sx={{ alignItems: 'center', cursor: 'pointer', flexShrink: 0, textDecoration: 'none', color: 'inherit' }}
           >
             <ReactableMark size={38} />
@@ -102,7 +103,7 @@ const Navbar = () => {
                 display: { xs: 'none', sm: 'block' },
               }}
             >
-              Nexora
+              Vuprise
             </Typography>
           </Stack>
 
@@ -231,7 +232,7 @@ const Navbar = () => {
                     {user?.name}
                   </Typography>
                   <Typography variant="caption" color="text.secondary" noWrap display="block">
-                    {user?.headline || user?.email}
+                    {getBrandedHeadline(user?.headline) || user?.email}
                   </Typography>
                 </Box>
                 <Divider />

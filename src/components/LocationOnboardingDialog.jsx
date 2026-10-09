@@ -57,7 +57,7 @@ const LocationOnboardingDialog = () => {
       </DialogTitle>
       <DialogContent sx={{ pt: '12px !important' }}>
         <Typography id="location-onboarding-description" variant="body2" color="text.secondary" sx={{ mb: 2.5 }}>
-          Select your country and state to personalize your Nexora experience.
+          Select your country and state to personalize your Vuprise experience.
         </Typography>
         {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
         <CountryRegionSelector value={selection} onChange={setSelection} disabled={saving} />

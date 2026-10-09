@@ -170,7 +170,7 @@ const RightWidgets = () => {
         </CardContent>
       </Card>
 
-      {/* Nexora Pro Banner */}
+      {/* Vuprise Pro Banner */}
       <Card
         sx={{
           background: (theme) =>
@@ -184,7 +184,7 @@ const RightWidgets = () => {
         <Stack spacing={1.5} alignItems="flex-start">
           <Chip
             icon={<AutoAwesomeRoundedIcon sx={{ fontSize: '14px !important', color: '#FCD34D !important' }} />}
-            label="NEXORA EXECUTIVE"
+            label="VUPRISE EXECUTIVE"
             size="small"
             sx={{ bgcolor: 'rgba(255,255,255,0.2)', color: '#fff', fontWeight: 700, fontSize: '0.7rem' }}
           />

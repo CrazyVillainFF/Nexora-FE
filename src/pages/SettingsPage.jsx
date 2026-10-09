@@ -184,7 +184,7 @@ const SettingsPage = () => {
             <Typography variant="h6" fontWeight={700}>Message recovery backup</Typography>
           </Stack>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            This is only for older encrypted message history. New messages sync with your account and do not need a backup. Your recovery passphrase encrypts the key on this device; Nexora never receives it.
+            This is only for older encrypted message history. New messages sync with your account and do not need a backup. Your recovery passphrase encrypts the key on this device; Vuprise never receives it.
           </Typography>
           {backupError && <Alert severity="error" sx={{ mb: 2 }} onClose={() => setBackupError('')}>{backupError}</Alert>}
           {keyBackup.loading ? <CircularProgress size={22} /> : keyBackup.error ? (
@@ -248,7 +248,7 @@ const SettingsPage = () => {
             </Typography>
           </Stack>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2.5 }}>
-            Select your preferred color mode for the Nexora interface.
+            Select your preferred color mode for the Vuprise interface.
           </Typography>
 
           <Grid container spacing={2}>
