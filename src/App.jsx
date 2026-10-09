@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { useMediaQuery } from '@mui/material';
+import { Box, CircularProgress, useMediaQuery } from '@mui/material';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { NotificationProvider } from './context/NotificationContext';
 import { ThemeContextProvider } from './theme/ThemeContext';
@@ -24,6 +24,7 @@ import NotificationsPage from './pages/NotificationsPage';
 import SettingsPage from './pages/SettingsPage';
 import NotFoundPage from './pages/NotFoundPage';
 import MessagesPage from './pages/MessagesPage';
+import PostDetailsPage from './pages/PostDetailsPage';
 
 const GhostCursor = React.lazy(() => import('./components/reactbits/GhostCursor'));
 
@@ -60,8 +61,15 @@ function GlobalGhostCursor() {
 // Root index route handler
 const RootRedirect = () => {
   const { isAuthenticated, loading } = useAuth();
-  if (loading) return null;
-  return isAuthenticated ? <Navigate to="/home" replace /> : <LandingPage />;
+  if (isAuthenticated) return <Navigate to="/home" replace />;
+  if (loading) {
+    return (
+      <Box sx={{ minHeight: '55dvh', display: 'grid', placeItems: 'center' }}>
+        <CircularProgress aria-label="Loading Nexora" />
+      </Box>
+    );
+  }
+  return <LandingPage />;
 };
 
 function App() {
@@ -93,6 +101,7 @@ function App() {
               >
                 <Route path="/home" element={<HomePage />} />
                 <Route path="/messages" element={<MessagesPage />} />
+                <Route path="/post/:id" element={<PostDetailsPage />} />
                 <Route path="/profile/:id" element={<ProfilePage />} />
                 <Route path="/profile/edit" element={<EditProfilePage />} />
                 <Route path="/people" element={<PeoplePage />} />

@@ -31,12 +31,12 @@ export const saveDeviceKeyPair = (userId, pair) => withStore('readwrite', (store
 export const createDeviceKeyPair = async (userId) => {
   const pair = await crypto.subtle.generateKey(
     { name: 'RSA-OAEP', modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: 'SHA-256' },
-    false,
+    true,
     ['encrypt', 'decrypt']
   );
   const publicJwk = await crypto.subtle.exportKey('jwk', pair.publicKey);
   const serializedPublicKey = JSON.stringify(publicJwk);
-  const signingPair = await crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, false, ['sign', 'verify']);
+  const signingPair = await crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, true, ['sign', 'verify']);
   const signingPublicJwk = await crypto.subtle.exportKey('jwk', signingPair.publicKey);
   const serializedSigningPublicKey = JSON.stringify(signingPublicJwk);
   const devicePair = {
@@ -73,10 +73,15 @@ export const ensureDeviceKeyPair = (userId, messageAPI) => {
     if (!devicePair) devicePair = await createDeviceKeyPair(accountId);
 
     if (!hasServerKey) {
-      await messageAPI.saveOwnKey(devicePair.serializedPublicKey, devicePair.serializedSigningPublicKey);
+      const savedKey = await messageAPI.saveOwnKey(devicePair.serializedPublicKey, devicePair.serializedSigningPublicKey);
+      devicePair.keyVersion = savedKey.data.keyVersion;
+      await saveDeviceKeyPair(accountId, devicePair);
     } else if (devicePair.serializedPublicKey !== serverKey.data.publicKey ||
         devicePair.serializedSigningPublicKey !== serverKey.data.signingPublicKey) {
       throw new Error('This browser key does not match the account key. Encrypted messaging is paused for safety.');
+    } else {
+      devicePair.keyVersion = serverKey.data.keyVersion;
+      if (savedPair.keyVersion !== devicePair.keyVersion) await saveDeviceKeyPair(accountId, devicePair);
     }
 
     return devicePair;

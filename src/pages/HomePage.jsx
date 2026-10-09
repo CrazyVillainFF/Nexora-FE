@@ -6,6 +6,7 @@ import EmptyState from '../components/EmptyState';
 import ErrorState from '../components/ErrorState';
 import { postAPI } from '../services/api';
 import DynamicFeedIcon from '@mui/icons-material/DynamicFeed';
+import RightWidgets from '../components/RightWidgets';
 
 const FILTER_TOPICS = ['All', 'designsystems', 'ai', 'distributedsystems', 'startups', 'leadership'];
 
@@ -62,9 +63,35 @@ const HomePage = () => {
   const openComposer = () => window.dispatchEvent(new Event('nexora:create-post'));
 
   return (
-    <Container maxWidth="md" sx={{ width: '100%', minWidth: 0 }}>
-      <Box sx={{ mb: 2.5, py: 0.5, minWidth: 0 }} aria-label="Filter posts by topic">
-        <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
+    <Container maxWidth="xl" sx={{ width: '100%', minWidth: 0 }}>
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: { xs: 'minmax(0, 1fr)', lg: 'minmax(0, 780px) minmax(260px, 300px)' },
+          justifyContent: 'center',
+          alignItems: 'start',
+          gap: { xs: 0, lg: 3 },
+          width: '100%',
+          minWidth: 0,
+        }}
+      >
+      <Box component="section" aria-label="Your feed" sx={{ width: '100%', minWidth: 0 }}>
+      <Box component="nav" sx={{ mb: 2.5, py: 0.5, minWidth: 0, width: '100%' }} aria-label="Filter posts by topic">
+        <Stack
+          direction="row"
+          spacing={1}
+          sx={{
+            width: '100%',
+            minWidth: 0,
+            flexWrap: 'nowrap',
+            overflowX: 'auto',
+            overflowY: 'hidden',
+            WebkitOverflowScrolling: 'touch',
+            scrollbarWidth: 'none',
+            '&::-webkit-scrollbar': { display: 'none' },
+            '& .MuiChip-root': { flexShrink: 0 },
+          }}
+        >
           {FILTER_TOPICS.map((tag) => (
             <Chip
               key={tag}
@@ -76,7 +103,7 @@ const HomePage = () => {
               }}
               color={selectedTag === tag ? 'primary' : 'default'}
               variant={selectedTag === tag ? 'filled' : 'outlined'}
-              sx={{ fontWeight: 600, borderRadius: 3, px: 0.5, maxWidth: '100%' }}
+              sx={{ fontWeight: 600, borderRadius: 3, px: 0.5 }}
             />
           ))}
         </Stack>
@@ -116,6 +143,15 @@ const HomePage = () => {
       <Typography component="span" sx={{ display: 'none' }} aria-live="polite">
         {posts.length} posts loaded
       </Typography>
+      </Box>
+      <Box
+        component="aside"
+        aria-label="People and trending topics"
+        sx={{ display: { xs: 'none', lg: 'block' }, width: '100%', minWidth: 0, position: 'sticky', top: 94 }}
+      >
+        <RightWidgets />
+      </Box>
+      </Box>
     </Container>
   );
 };

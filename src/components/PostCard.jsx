@@ -322,7 +322,7 @@ const PostCard = ({ post, onPostDeleted, onPostUpdated }) => {
               </Stack>
             </Box>
           ) : (
-            <Typography variant="body1" sx={{ whiteSpace: 'pre-line', lineHeight: 1.65 }}>
+            <Typography variant="body1" sx={{ whiteSpace: 'pre-line', lineHeight: 1.65, minWidth: 0, overflowWrap: 'anywhere' }}>
               {renderFormattedContent(post.content)}
             </Typography>
           )}
@@ -435,7 +435,7 @@ const PostCard = ({ post, onPostDeleted, onPostUpdated }) => {
                 >
                   {currentUser?.name ? currentUser.name[0] : 'U'}
                 </Avatar>
-                <Box component="form" onSubmit={handleAddComment} sx={{ flex: 1 }}>
+                <Box component="form" onSubmit={handleAddComment} sx={{ flex: 1, minWidth: 0 }}>
                   <TextField
                     fullWidth
                     size="small"
@@ -525,7 +525,7 @@ const PostCard = ({ post, onPostDeleted, onPostUpdated }) => {
                             )}
                           </Stack>
                         </Stack>
-                        <Typography variant="body2" sx={{ mt: 0.5, fontSize: '0.875rem' }}>
+                        <Typography variant="body2" sx={{ mt: 0.5, fontSize: '0.875rem', overflowWrap: 'anywhere' }}>
                           {comment.content}
                         </Typography>
                       </Box>

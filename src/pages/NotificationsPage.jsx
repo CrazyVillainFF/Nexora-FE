@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
+  Alert,
   Container,
   Card,
   Typography,
@@ -22,15 +23,45 @@ import PersonAddRoundedIcon from '@mui/icons-material/PersonAddRounded';
 import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
 import DoneAllRoundedIcon from '@mui/icons-material/DoneAllRounded';
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
+import { connectionAPI } from '../services/api';
 
 import { useNotifications } from '../context/NotificationContext';
 import { formatTimeAgo } from '../utils/formatters';
 import EmptyState from '../components/EmptyState';
 
 const NotificationsPage = () => {
-  const { notifications, unreadCount, markAsRead, markAllAsRead, deleteNotification, loading } = useNotifications();
+  const { notifications, unreadCount, markAsRead, markAllAsRead, deleteNotification, loading, error, clearError, fetchNotifications } = useNotifications();
   const [tabIndex, setTabIndex] = useState(0);
+  const [pendingIncoming, setPendingIncoming] = useState([]);
+  const [loadingRequestId, setLoadingRequestId] = useState('');
+  const [actionError, setActionError] = useState('');
   const navigate = useNavigate();
+
+  const loadPendingRequests = useCallback(async () => {
+    try {
+      const response = await connectionAPI.getConnections();
+      setPendingIncoming(response.data.pendingIncoming || []);
+    } catch (requestError) {
+      setActionError(requestError.message || 'Could not check pending connection requests.');
+    }
+  }, []);
+
+  useEffect(() => {
+    loadPendingRequests();
+    const interval = setInterval(loadPendingRequests, 30000);
+    return () => clearInterval(interval);
+  }, [loadPendingRequests]);
+
+  const latestRequestNotificationBySender = useMemo(() => {
+    const latest = new Map();
+    notifications.forEach((item) => {
+      const senderId = item.sender?._id || item.sender;
+      if (item.type === 'connection_request' && senderId && !latest.has(String(senderId))) {
+        latest.set(String(senderId), item._id);
+      }
+    });
+    return latest;
+  }, [notifications]);
 
   const filteredNotifications = notifications.filter((n) => {
     if (tabIndex === 1) return !n.read;
@@ -63,7 +94,24 @@ const NotificationsPage = () => {
         navigate(`/profile/${item.sender?._id || item.sender}`);
       }
     } else if (item.post) {
-      navigate('/home');
+      navigate(item.post?._id ? `/post/${item.post._id}` : '/home');
+    }
+  };
+
+  const handleConnectionRequest = async (event, item, requestId, action) => {
+    event.stopPropagation();
+    if (!requestId || loadingRequestId) return;
+    try {
+      setLoadingRequestId(item._id);
+      setActionError('');
+      if (action === 'accept') await connectionAPI.acceptRequest(requestId);
+      else await connectionAPI.rejectOrRemove(requestId);
+      await Promise.all([markAsRead(item._id), fetchNotifications(), loadPendingRequests()]);
+    } catch (requestError) {
+      setActionError(requestError.message || 'This connection request could not be updated.');
+      await Promise.all([fetchNotifications(), loadPendingRequests()]);
+    } finally {
+      setLoadingRequestId('');
     }
   };
 
@@ -92,6 +140,12 @@ const NotificationsPage = () => {
         )}
       </Stack>
 
+      {(error || actionError) && (
+        <Alert severity="error" sx={{ mb: 2 }} onClose={() => { clearError(); setActionError(''); }}>
+          {actionError || error}
+        </Alert>
+      )}
+
       {/* Filter Tabs */}
       <Card sx={{ mb: 3 }}>
         <Tabs
@@ -115,22 +169,31 @@ const NotificationsPage = () => {
             const sender = item.sender || {};
             return (
               <Box key={item._id}>
-                <Box
+                  <Box
+                  role="group"
+                  tabIndex={0}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault();
+                      handleNotificationClick(item);
+                    }
+                  }}
                   onClick={() => handleNotificationClick(item)}
                   sx={{
-                    p: 2.5,
+                    p: { xs: 1.5, sm: 2 },
                     display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
+                    alignItems: { xs: 'flex-start', sm: 'center' },
+                    flexWrap: { xs: 'wrap', sm: 'nowrap' },
                     cursor: 'pointer',
                     bgcolor: item.read ? 'transparent' : 'action.selected',
                     transition: 'all 0.15s ease',
                     '&:hover': {
                       bgcolor: 'action.hover',
                     },
+                    '&:focus-visible': { outline: '2px solid', outlineColor: 'primary.main', outlineOffset: '-2px' },
                   }}
                 >
-                  <Stack direction="row" spacing={2} alignItems="center" sx={{ flex: 1, minWidth: 0, pr: 2 }}>
+                    <Stack direction="row" spacing={{ xs: 1.25, sm: 2 }} alignItems="center" sx={{ flex: 1, minWidth: 0, pr: { xs: 0, sm: 2 } }}>
                     {/* Avatar with Type Icon Badge */}
                     <Box sx={{ position: 'relative' }}>
                       <Avatar
@@ -158,7 +221,7 @@ const NotificationsPage = () => {
 
                     {/* Content */}
                     <Box sx={{ flex: 1, minWidth: 0 }}>
-                      <Typography variant="body2" sx={{ fontWeight: item.read ? 500 : 700 }}>
+                        <Typography variant="body2" sx={{ fontWeight: item.read ? 500 : 700, overflowWrap: 'anywhere' }}>
                         {item.message}
                       </Typography>
                       <Typography variant="caption" color="text.secondary">
@@ -168,7 +231,28 @@ const NotificationsPage = () => {
                   </Stack>
 
                   {/* Actions */}
-                  <Stack direction="row" spacing={0.5} alignItems="center">
+                  <Stack direction="row" spacing={0.5} alignItems="center" sx={{ ml: { xs: 'auto', sm: 0 }, pl: { xs: 1, sm: 0 }, flexShrink: 0 }}>
+                    {item.type === 'connection_request' && (() => {
+                      const senderId = String(item.sender?._id || item.sender || '');
+                      const linkedRequest = item.connection && typeof item.connection === 'object' ? item.connection : null;
+                      const liveRequest = linkedRequest
+                        ? pendingIncoming.find((request) => String(request._id) === String(linkedRequest._id))
+                        : pendingIncoming.find((request) => String(request.requester?._id || request.requester) === senderId);
+                      const isLatest = latestRequestNotificationBySender.get(senderId) === item._id;
+                      const requestId = liveRequest?._id;
+                      if (!requestId || !isLatest) return null;
+                      const pending = loadingRequestId === item._id;
+                      return (
+                        <React.Fragment key={`request-actions-${item._id}`}>
+                          <Button size="small" variant="contained" disabled={pending || Boolean(loadingRequestId)} onClick={(event) => handleConnectionRequest(event, item, requestId, 'accept')} aria-label={`Accept connection request from ${sender.name || 'member'}`}>
+                            {pending ? <CircularProgress size={16} color="inherit" /> : 'Accept'}
+                          </Button>
+                          <Button size="small" variant="outlined" color="inherit" disabled={pending || Boolean(loadingRequestId)} onClick={(event) => handleConnectionRequest(event, item, requestId, 'decline')} aria-label={`Decline connection request from ${sender.name || 'member'}`}>
+                            Decline
+                          </Button>
+                        </React.Fragment>
+                      );
+                    })()}
                     {!item.read && (
                       <Box
                         sx={{

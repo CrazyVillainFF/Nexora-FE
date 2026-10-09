@@ -9,11 +9,13 @@ export const NotificationProvider = ({ children }) => {
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const fetchNotifications = useCallback(async () => {
     if (!isAuthenticated) {
       setNotifications([]);
       setUnreadCount(0);
+      setError('');
       return;
     }
 
@@ -23,9 +25,11 @@ export const NotificationProvider = ({ children }) => {
       if (res.data.success) {
         setNotifications(res.data.notifications || []);
         setUnreadCount(res.data.unreadCount || 0);
+        setError('');
       }
     } catch (err) {
       console.error('[Notifications] Failed to load:', err.message);
+      setError(err.message || 'Could not load notifications.');
     } finally {
       setLoading(false);
     }
@@ -48,10 +52,11 @@ export const NotificationProvider = ({ children }) => {
         setNotifications((prev) =>
           prev.map((n) => (n._id === id ? { ...n, read: true } : n))
         );
-        setUnreadCount((prev) => Math.max(0, prev - 1));
+        setUnreadCount(res.data.unreadCount ?? 0);
       }
     } catch (err) {
       console.error('[Notification] Error marking as read:', err.message);
+      setError(err.message || 'Could not update this notification.');
     }
   };
 
@@ -60,25 +65,24 @@ export const NotificationProvider = ({ children }) => {
       const res = await notificationAPI.markAllAsRead();
       if (res.data.success) {
         setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-        setUnreadCount(0);
+        setUnreadCount(res.data.unreadCount ?? 0);
       }
     } catch (err) {
       console.error('[Notification] Error marking all as read:', err.message);
+      setError(err.message || 'Could not mark notifications as read.');
     }
   };
 
   const deleteNotification = async (id) => {
     try {
-      const target = notifications.find((n) => n._id === id);
       const res = await notificationAPI.deleteNotification(id);
       if (res.data.success) {
         setNotifications((prev) => prev.filter((n) => n._id !== id));
-        if (target && !target.read) {
-          setUnreadCount((prev) => Math.max(0, prev - 1));
-        }
+        setUnreadCount(res.data.unreadCount ?? 0);
       }
     } catch (err) {
       console.error('[Notification] Error deleting notification:', err.message);
+      setError(err.message || 'Could not remove this notification.');
     }
   };
 
@@ -88,6 +92,8 @@ export const NotificationProvider = ({ children }) => {
         notifications,
         unreadCount,
         loading,
+        error,
+        clearError: () => setError(''),
         fetchNotifications,
         markAsRead,
         markAllAsRead,

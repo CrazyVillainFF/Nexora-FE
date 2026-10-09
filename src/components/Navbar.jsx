@@ -13,7 +13,8 @@ import {
   Button,
   Stack,
   Tooltip,
-  Divider
+  Divider,
+  useMediaQuery
 } from '@mui/material';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
@@ -38,6 +39,7 @@ const Navbar = () => {
   const { user, isAuthenticated, logout } = useAuth();
   const { unreadCount } = useNotifications();
   const { mode, toggleTheme } = useThemeMode();
+  const compactHeader = useMediaQuery((theme) => theme.breakpoints.down('sm'));
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -80,13 +82,15 @@ const Navbar = () => {
       }}
     >
       <Container maxWidth="xl">
-        <Toolbar disableGutters sx={{ minHeight: { xs: 60, md: 70 }, gap: { xs: 0.75, sm: 2 }, width: '100%', minWidth: 0 }}>
+        <Toolbar disableGutters sx={{ minHeight: { xs: 60, md: 70 }, gap: { xs: 0.75, sm: 2 }, width: '100%', minWidth: 0, flexWrap: 'nowrap' }}>
           {/* Brand Logo */}
           <Stack
+            component={NavLink}
+            to={isAuthenticated ? '/home' : '/'}
             direction="row"
             spacing={1.25}
-            onClick={() => navigate(isAuthenticated ? '/home' : '/')}
-            sx={{ alignItems: 'center', cursor: 'pointer', flexShrink: 0, textDecoration: 'none' }}
+            aria-label="Nexora home"
+            sx={{ alignItems: 'center', cursor: 'pointer', flexShrink: 0, textDecoration: 'none', color: 'inherit' }}
           >
             <ReactableMark size={38} />
             <Typography
@@ -103,22 +107,23 @@ const Navbar = () => {
           </Stack>
 
           {/* Global Search Bar */}
-          <Box sx={{ flex: 1, minWidth: 0, maxWidth: { xs: '100%', sm: 380, md: 460 }, mx: { xs: 0, sm: 2 } }}>
-            <SearchBar />
+          <Box sx={{ flex: 1, minWidth: 0, maxWidth: { xs: '100%', sm: 380, md: 420, lg: 280, xl: 380 }, mx: { xs: 0, sm: 2 } }}>
+            <SearchBar placeholder={compactHeader ? 'Search' : undefined} />
           </Box>
 
-          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'block' } }} />
+          <Box sx={{ flexGrow: 1, display: { xs: 'none', lg: 'block' }, minWidth: 0 }} />
 
           {/* Desktop Nav Items */}
           {isAuthenticated ? (
-            <Stack direction="row" spacing={1} sx={{ alignItems: 'center', display: { xs: 'none', md: 'flex' } }}>
+            <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center', display: { xs: 'none', lg: 'flex' }, flexShrink: 0 }}>
               <Button
                 variant="contained"
                 startIcon={<AddRoundedIcon />}
                 onClick={() => window.dispatchEvent(new Event('nexora:create-post'))}
+                aria-label="Create post"
                 sx={{ borderRadius: 2.5, whiteSpace: 'nowrap' }}
               >
-                Create post
+                <Box component="span" sx={{ display: { lg: 'none', xl: 'inline' } }}>Create post</Box>
               </Button>
               {navItems.map((item) => {
                 const Icon = item.icon;
@@ -129,6 +134,7 @@ const Navbar = () => {
                     key={item.path}
                     component={NavLink}
                     to={item.path}
+                  aria-label={item.label}
                     startIcon={
                       item.badge > 0 ? (
                         <Badge badgeContent={item.badge} color="error" max={99}>
@@ -141,8 +147,9 @@ const Navbar = () => {
                     sx={{
                       color: isActive ? 'primary.main' : 'text.secondary',
                       bgcolor: isActive ? 'action.selected' : 'transparent',
-                      px: 2,
+                      px: { lg: 1, xl: 1.5 },
                       py: 1,
+                      minWidth: { lg: 42, xl: 'auto' },
                       fontWeight: isActive ? 700 : 500,
                       borderRadius: 2.5,
                       '&:hover': {
@@ -151,7 +158,7 @@ const Navbar = () => {
                       },
                     }}
                   >
-                    {item.label}
+                    <Box component="span" sx={{ display: { lg: 'none', xl: 'inline' } }}>{item.label}</Box>
                   </Button>
                 );
               })}
@@ -177,7 +184,13 @@ const Navbar = () => {
           {/* User Profile Avatar / Menu */}
           {isAuthenticated && (
             <Box sx={{ ml: { xs: 0, sm: 1 }, flexShrink: 0 }}>
-              <IconButton onClick={handleOpenMenu} sx={{ p: 0.25 }}>
+              <IconButton
+                onClick={handleOpenMenu}
+                aria-label="Open profile menu"
+                aria-haspopup="menu"
+                aria-expanded={Boolean(anchorEl)}
+                sx={{ p: 0.25, width: 44, height: 44 }}
+              >
                 <Avatar
                   src={user?.profilePicture}
                   alt={user?.name}
@@ -195,13 +208,19 @@ const Navbar = () => {
                 anchorEl={anchorEl}
                 open={Boolean(anchorEl)}
                 onClose={handleCloseMenu}
-                PaperProps={{
-                  sx: {
-                    mt: 1.5,
-                    minWidth: 220,
-                    borderRadius: 3,
-                    boxShadow: 4,
-                    border: (theme) => `1px solid ${theme.palette.divider}`,
+                marginThreshold={12}
+                slotProps={{
+                  list: { 'aria-label': 'Profile menu' },
+                  paper: {
+                    sx: {
+                      mt: 1.5,
+                      width: 'min(280px, calc(100vw - 24px))',
+                      minWidth: 'min(220px, calc(100vw - 24px))',
+                      maxHeight: 'calc(100dvh - 24px)',
+                      borderRadius: 3,
+                      boxShadow: 4,
+                      border: (theme) => `1px solid ${theme.palette.divider}`,
+                    },
                   },
                 }}
                 transformOrigin={{ horizontal: 'right', vertical: 'top' }}

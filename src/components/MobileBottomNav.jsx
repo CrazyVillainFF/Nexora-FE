@@ -42,7 +42,7 @@ const MobileBottomNav = () => {
           boxSizing: 'border-box',
           overflowX: 'clip',
           zIndex: 1300,
-          display: { xs: 'block', md: 'none' },
+          display: { xs: 'block', lg: 'none' },
           borderTop: (theme) => `1px solid ${theme.palette.divider}`,
           backdropFilter: 'blur(12px)',
           bgcolor: (theme) => theme.palette.mode === 'light'

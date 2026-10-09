@@ -44,12 +44,14 @@ const ProfilePage = () => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingPosts, setLoadingPosts] = useState(true);
+  const [postsError, setPostsError] = useState(null);
   const [error, setError] = useState(null);
 
   // Upload modals
   const [avatarModalOpen, setAvatarModalOpen] = useState(false);
   const [coverModalOpen, setCoverModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
+  const [toastSeverity, setToastSeverity] = useState('success');
 
   const profileUserId = id || (currentUser ? currentUser._id : null);
   const isOwnProfile = currentUser && profileUserId === currentUser._id;
@@ -76,12 +78,14 @@ const ProfilePage = () => {
     const fetchUserPosts = async () => {
       try {
         setLoadingPosts(true);
+        setPostsError(null);
         const res = await postAPI.getUserPosts(profileUserId);
         if (res.data.success) {
           setPosts(res.data.posts || []);
         }
       } catch (err) {
         console.error('[User Posts Fetch Error]', err.message);
+        setPostsError('Unable to load this member’s activity. Please try again.');
       } finally {
         setLoadingPosts(false);
       }
@@ -100,7 +104,8 @@ const ProfilePage = () => {
       if (isOwnProfile) {
         updateUser({ profilePicture: res.data.profilePicture });
       }
-      setToastMessage('Profile picture updated successfully.');
+        setToastSeverity('success');
+        setToastMessage('Profile picture updated successfully.');
     }
   };
 
@@ -113,15 +118,30 @@ const ProfilePage = () => {
       if (isOwnProfile) {
         updateUser({ coverImage: res.data.coverImage });
       }
-      setToastMessage('Cover banner updated successfully.');
+        setToastSeverity('success');
+        setToastMessage('Cover banner updated successfully.');
     }
   };
 
-  const handleShareProfile = () => {
-    const url = window.location.href;
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(url);
-      setToastMessage('Profile link copied to clipboard!');
+  const handleShareProfile = async () => {
+    const url = `${window.location.origin}/profile/${profile?._id || profileUserId}`;
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: `${profile.name} on Nexora`, url });
+        setToastSeverity('success');
+        setToastMessage('Profile link shared.');
+      } else if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(url);
+        setToastSeverity('success');
+        setToastMessage('Profile link copied to clipboard.');
+      } else {
+        throw new Error('Sharing is not available in this browser. Copy the profile URL from the address bar.');
+      }
+    } catch (error) {
+      if (error.name !== 'AbortError') {
+        setToastSeverity('error');
+        setToastMessage(error.message || 'Could not share this profile.');
+      }
     }
   };
 
@@ -259,7 +279,7 @@ const ProfilePage = () => {
           <Box sx={{ mt: 2 }}>
             <Stack direction="row" spacing={1} alignItems="center">
               <Typography variant="h4" fontWeight={800} letterSpacing="-0.02em">
-                {profile.name}
+                {isOwnProfile ? `${profile.name} (Owner)` : profile.name}
               </Typography>
               <VerifiedRoundedIcon sx={{ fontSize: 24, color: 'primary.main' }} />
             </Stack>
@@ -302,7 +322,7 @@ const ProfilePage = () => {
 
             {/* Connection Counters */}
             <Typography variant="body2" fontWeight={700} color="primary.main" sx={{ mt: 1.5 }}>
-              {profile.connections ? profile.connections.length : 0} connections • {profile.postCount || posts.length} contributions
+              {profile.connections ? profile.connections.length : 0} {profile.connections?.length === 1 ? 'connection' : 'connections'} • {profile.postCount ?? posts.length} {(profile.postCount ?? posts.length) === 1 ? 'contribution' : 'contributions'}
             </Typography>
           </Box>
         </Box>
@@ -313,8 +333,8 @@ const ProfilePage = () => {
         <Grid size={{ xs: 12, md: 8 }}>
           {/* About Section */}
           <Card sx={{ p: 3, mb: 3 }}>
-            <Typography variant="h6" fontWeight={700} gutterBottom>
-              About & Architectural Vision
+              <Typography variant="h6" fontWeight={700} gutterBottom>
+              About
             </Typography>
             <Typography variant="body1" color="text.secondary" sx={{ whiteSpace: 'pre-line', lineHeight: 1.7 }}>
               {profile.bio || 'This professional has not provided an extended bio yet.'}
@@ -364,6 +384,11 @@ const ProfilePage = () => {
                 <PostSkeleton />
                 <PostSkeleton />
               </Stack>
+            ) : postsError ? (
+              <ErrorState title="Activity unavailable" message={postsError} onRetry={() => {
+                setLoadingPosts(true);
+                postAPI.getUserPosts(profileUserId).then((res) => setPosts(res.data.posts || [])).catch(() => setPostsError('Unable to load this member’s activity. Please try again.')).finally(() => setLoadingPosts(false));
+              }} />
             ) : posts.length > 0 ? (
               <Stack spacing={0}>
                 {posts.map((post) => (
@@ -466,7 +491,7 @@ const ProfilePage = () => {
         onClose={() => setToastMessage(null)}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >
-        <Alert severity="success" sx={{ borderRadius: 2 }}>
+        <Alert severity={toastSeverity} sx={{ borderRadius: 2 }}>
           {toastMessage}
         </Alert>
       </Snackbar>

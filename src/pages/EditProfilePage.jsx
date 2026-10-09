@@ -23,6 +23,7 @@ import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
 import SaveRoundedIcon from '@mui/icons-material/SaveRounded';
+import CountryRegionSelector from '../components/CountryRegionSelector';
 
 import { useAuth } from '../context/AuthContext';
 import { userAPI } from '../services/api';
@@ -45,6 +46,7 @@ const EditProfilePage = () => {
   const [newSkillInput, setNewSkillInput] = useState('');
   const [experiences, setExperiences] = useState([]);
   const [educations, setEducations] = useState([]);
+  const [locationSelection, setLocationSelection] = useState({ country: '', countryCode: '', region: '', regionCode: '' });
 
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -65,6 +67,12 @@ const EditProfilePage = () => {
       setSkills(user.skills || []);
       setExperiences(user.experience || []);
       setEducations(user.education || []);
+      setLocationSelection({
+        country: user.locationCountry || '',
+        countryCode: user.locationCountryCode || '',
+        region: user.locationRegion || '',
+        regionCode: user.locationRegionCode || '',
+      });
     }
   }, [user]);
 
@@ -126,12 +134,27 @@ const EditProfilePage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (locationSelection.countryCode && (!locationSelection.region.trim() || !locationSelection.country.trim())) {
+      setError('Choose both a country and state or region, or clear the location selection.');
+      return;
+    }
     try {
       setSaving(true);
       setError(null);
 
       const payload = {
         ...formData,
+        ...(locationSelection.countryCode ? {
+          locationCountry: locationSelection.country,
+          locationCountryCode: locationSelection.countryCode,
+          locationRegion: locationSelection.region,
+          locationRegionCode: locationSelection.regionCode,
+        } : user.locationCountryCode ? {
+          locationCountry: '',
+          locationCountryCode: '',
+          locationRegion: '',
+          locationRegionCode: '',
+        } : {}),
         skills,
         experience: experiences.filter((exp) => exp.title.trim() && exp.company.trim()),
         education: educations.filter((edu) => edu.school.trim()),
@@ -214,6 +237,19 @@ const EditProfilePage = () => {
                   onChange={handleInputChange}
                   helperText="Summarize your primary role and domain expertise."
                 />
+              </Grid>
+              <Grid size={{ xs: 12 }}>
+                <CountryRegionSelector
+                  value={locationSelection}
+                  onChange={(next) => {
+                    setLocationSelection(next);
+                    setFormData((current) => ({ ...current, location: next.region && next.country ? `${next.region}, ${next.country}` : '' }));
+                  }}
+                  required={false}
+                />
+                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.75 }}>
+                  Your country and region appear on your profile. Leave both blank to keep using the location text above.
+                </Typography>
               </Grid>
               <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField

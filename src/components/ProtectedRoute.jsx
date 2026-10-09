@@ -7,6 +7,10 @@ const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
   const location = useLocation();
 
+  // Render cached signed-in sessions immediately while checkAuth validates them.
+  // If the server rejects a stale token, the auth interceptor logs the user out.
+  if (isAuthenticated) return children;
+
   if (loading) {
     return (
       <Box
