@@ -11,11 +11,8 @@ import {
   InputAdornment,
   Chip,
   Card,
-  CardContent,
   Avatar,
-  Button,
-  Divider,
-  CircularProgress
+  Button
 } from '@mui/material';
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
 import PeopleAltRoundedIcon from '@mui/icons-material/PeopleAltRounded';
@@ -29,7 +26,6 @@ import UserCard from '../components/UserCard';
 import { UserCardSkeleton } from '../components/LoadingSkeleton';
 import EmptyState from '../components/EmptyState';
 import ErrorState from '../components/ErrorState';
-import ConnectionButton from '../components/ConnectionButton';
 
 const SKILL_FILTERS = ['All', 'Design Systems', 'Distributed Systems', 'Deep Learning', 'Robotics', 'Fintech', 'Go', 'Rust', 'Figma'];
 
@@ -183,7 +179,7 @@ const PeoplePage = () => {
               sx={{ maxWidth: { xs: '100%', md: 380 }, bgcolor: 'background.paper', borderRadius: 2 }}
             />
 
-            <Stack direction="row" spacing={1} overflow="auto" sx={{ py: 0.5 }}>
+            <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap" sx={{ py: 0.5, minWidth: 0 }}>
               {SKILL_FILTERS.map((skill) => (
                 <Chip
                   key={skill}
@@ -306,7 +302,7 @@ const PeoplePage = () => {
                               {sender.name}
                             </Typography>
                             <Typography variant="body2" color="text.secondary">
-                              {sender.headline || sender.company || 'Professional at Reactable'}
+                              {sender.headline || sender.company || 'Professional at Nexora'}
                             </Typography>
                             {sender.location && (
                               <Typography variant="caption" color="text.secondary">

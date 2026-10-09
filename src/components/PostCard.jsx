@@ -235,7 +235,7 @@ const PostCard = ({ post, onPostDeleted, onPostUpdated }) => {
               sx={{ cursor: 'pointer', '&:hover': { color: 'primary.main' } }}
               onClick={() => navigate(`/profile/${author._id}`)}
             >
-              {author.name || 'Reactable member'}
+              {author.name || 'Nexora member'}
             </Typography>
           }
           subheader={

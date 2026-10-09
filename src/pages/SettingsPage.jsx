@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import {
   Container,
   Card,
-  CardContent,
   Typography,
   Grid,
   Stack,
@@ -18,7 +17,6 @@ import {
 } from '@mui/material';
 import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined';
 import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import SecurityRoundedIcon from '@mui/icons-material/SecurityRounded';
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 import PaletteOutlinedIcon from '@mui/icons-material/PaletteOutlined';
@@ -27,9 +25,10 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useThemeMode } from '../theme/ThemeContext';
 import { authAPI } from '../services/api';
+import { userAPI } from '../services/api';
 
 const SettingsPage = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, updateUser } = useAuth();
   const { mode, setThemeMode } = useThemeMode();
   const navigate = useNavigate();
 
@@ -42,6 +41,23 @@ const SettingsPage = () => {
   const [changingPassword, setChangingPassword] = useState(false);
   const [passwordError, setPasswordError] = useState(null);
   const [toastMessage, setToastMessage] = useState(null);
+  const [savingPrivacy, setSavingPrivacy] = useState(false);
+  const [privacyError, setPrivacyError] = useState(null);
+
+  const handlePrivateAccountChange = async (event) => {
+    const privateAccount = event.target.checked;
+    try {
+      setSavingPrivacy(true);
+      setPrivacyError(null);
+      const response = await userAPI.updateSettings({ privateAccount });
+      updateUser(response.data.user);
+      setToastMessage(privateAccount ? 'Private Account is on.' : 'Private Account is off.');
+    } catch (err) {
+      setPrivacyError(err.message || 'Could not update your privacy setting.');
+    } finally {
+      setSavingPrivacy(false);
+    }
+  };
 
   const handlePasswordSubmit = async (e) => {
     e.preventDefault();
@@ -50,8 +66,8 @@ const SettingsPage = () => {
       return;
     }
 
-    if (passwordForm.newPassword.length < 6) {
-      setPasswordError('New password must be at least 6 characters.');
+    if (passwordForm.newPassword.length < 8) {
+      setPasswordError('New password must be at least 8 characters.');
       return;
     }
 
@@ -99,7 +115,7 @@ const SettingsPage = () => {
             </Typography>
           </Stack>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2.5 }}>
-            Select your preferred color mode for the Reactable interface.
+            Select your preferred color mode for the Nexora interface.
           </Typography>
 
           <Grid container spacing={2}>
@@ -159,6 +175,23 @@ const SettingsPage = () => {
               </Box>
             </Grid>
           </Grid>
+        </Card>
+
+        <Card sx={{ p: 3 }}>
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems={{ xs: 'stretch', sm: 'center' }} justifyContent="space-between">
+            <Box sx={{ minWidth: 0 }}>
+              <Typography variant="h6" fontWeight={700}>Private Account</Typography>
+              <Typography variant="body2" color="text.secondary">
+                Only your accepted connections can see your posts.
+              </Typography>
+            </Box>
+            <FormControlLabel
+              label={user?.privateAccount ? 'On' : 'Off'}
+              control={<Switch checked={Boolean(user?.privateAccount)} onChange={handlePrivateAccountChange} disabled={savingPrivacy} inputProps={{ 'aria-label': 'Private Account' }} />}
+              sx={{ m: 0, flexShrink: 0 }}
+            />
+          </Stack>
+          {privacyError && <Alert severity="error" sx={{ mt: 2 }}>{privacyError}</Alert>}
         </Card>
 
         {/* SECTION 2: Security & Password */}

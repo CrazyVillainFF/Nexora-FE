@@ -17,6 +17,8 @@ import {
 } from '@mui/material';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
+import ChatBubbleOutlineRoundedIcon from '@mui/icons-material/ChatBubbleOutlineRounded';
+import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import PeopleAltRoundedIcon from '@mui/icons-material/PeopleAltRounded';
 import NotificationsRoundedIcon from '@mui/icons-material/NotificationsRounded';
 import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined';
@@ -52,6 +54,7 @@ const Navbar = () => {
 
   const navItems = [
     { label: 'Feed', path: '/home', icon: HomeRoundedIcon },
+    { label: 'Message', path: '/messages', icon: ChatBubbleOutlineRoundedIcon },
     { label: 'Network', path: '/people', icon: PeopleAltRoundedIcon },
     {
       label: 'Notifications',
@@ -95,7 +98,7 @@ const Navbar = () => {
                 display: { xs: 'none', sm: 'block' },
               }}
             >
-              Reactable
+              Nexora
             </Typography>
           </Stack>
 
@@ -109,6 +112,14 @@ const Navbar = () => {
           {/* Desktop Nav Items */}
           {isAuthenticated ? (
             <Stack direction="row" spacing={1} sx={{ alignItems: 'center', display: { xs: 'none', md: 'flex' } }}>
+              <Button
+                variant="contained"
+                startIcon={<AddRoundedIcon />}
+                onClick={() => window.dispatchEvent(new Event('nexora:create-post'))}
+                sx={{ borderRadius: 2.5, whiteSpace: 'nowrap' }}
+              >
+                Create post
+              </Button>
               {navItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = location.pathname === item.path;

@@ -14,6 +14,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import LandingPage from './pages/LandingPage';
 import SignInPage from './pages/SignInPage';
 import SignUpPage from './pages/SignUpPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import HomePage from './pages/HomePage';
 import ProfilePage from './pages/ProfilePage';
 import EditProfilePage from './pages/EditProfilePage';
@@ -22,6 +23,7 @@ import SearchPage from './pages/SearchPage';
 import NotificationsPage from './pages/NotificationsPage';
 import SettingsPage from './pages/SettingsPage';
 import NotFoundPage from './pages/NotFoundPage';
+import MessagesPage from './pages/MessagesPage';
 
 const GhostCursor = React.lazy(() => import('./components/reactbits/GhostCursor'));
 
@@ -78,6 +80,7 @@ function App() {
               <Route element={<AuthLayout />}>
                 <Route path="/signin" element={<SignInPage />} />
                 <Route path="/signup" element={<SignUpPage />} />
+                <Route path="/forgot-password" element={<ForgotPasswordPage />} />
               </Route>
 
               {/* Main Application Protected Routes */}
@@ -89,6 +92,7 @@ function App() {
                 }
               >
                 <Route path="/home" element={<HomePage />} />
+                <Route path="/messages" element={<MessagesPage />} />
                 <Route path="/profile/:id" element={<ProfilePage />} />
                 <Route path="/profile/edit" element={<EditProfilePage />} />
                 <Route path="/people" element={<PeoplePage />} />

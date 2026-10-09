@@ -11,7 +11,9 @@ import {
   IconButton,
   Alert,
   Divider,
-  CircularProgress
+  CircularProgress,
+  ToggleButton,
+  ToggleButtonGroup
 } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
 import PersonOutlineRoundedIcon from '@mui/icons-material/PersonOutlineRounded';
@@ -22,12 +24,18 @@ import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 import { useAuth } from '../context/AuthContext';
 
+const MAX_COURSE_START_YEAR = new Date().getFullYear() + 10;
+
 const SignUpPage = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    accountType: '',
     jobTitle: '',
     company: '',
+    schoolName: '',
+    course: '',
+    courseStartYear: '',
     password: '',
     confirmPassword: '',
   });
@@ -42,17 +50,40 @@ const SignUpPage = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const handleAccountTypeChange = (_event, accountType) => {
+    if (!accountType) return;
+    setFormData((current) => ({
+      ...current,
+      accountType,
+      jobTitle: '',
+      company: '',
+      schoolName: '',
+      course: '',
+      courseStartYear: ''
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { name, email, password, confirmPassword, jobTitle, company } = formData;
+    const { name, email, password, confirmPassword, accountType, jobTitle, company, schoolName, course, courseStartYear } = formData;
 
-    if (!name.trim() || !email.trim() || !password) {
+    if (!name.trim() || !email.trim() || !password || !accountType) {
       setError('Please fill in all required fields.');
       return;
     }
 
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters long.');
+    if (accountType === 'student' && (!schoolName.trim() || !course.trim() || !courseStartYear)) {
+      setError('Please add your school or college, course, and course start year.');
+      return;
+    }
+
+    if (accountType === 'workplace' && (!jobTitle.trim() || !company.trim())) {
+      setError('Please add your work role and company or organization.');
+      return;
+    }
+
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters long.');
       return;
     }
 
@@ -69,9 +100,15 @@ const SignUpPage = () => {
         email: email.trim(),
         password,
         confirmPassword,
-        jobTitle: jobTitle.trim(),
-        company: company.trim(),
-        headline: jobTitle && company ? `${jobTitle} at ${company}` : jobTitle || 'Professional at Reactable'
+        accountType,
+        jobTitle: accountType === 'workplace' ? jobTitle.trim() : 'Student',
+        company: accountType === 'workplace' ? company.trim() : schoolName.trim(),
+        schoolName: accountType === 'student' ? schoolName.trim() : '',
+        course: accountType === 'student' ? course.trim() : '',
+        courseStartYear: accountType === 'student' ? courseStartYear : '',
+        headline: accountType === 'student'
+          ? `${course.trim()} student at ${schoolName.trim()}`
+          : `${jobTitle.trim()} at ${company.trim()}`
       });
       navigate('/home');
     } catch (err) {
@@ -86,7 +123,7 @@ const SignUpPage = () => {
       <CardContent sx={{ p: '0 !important' }}>
         <Box sx={{ mb: 3 }}>
           <Typography variant="h5" fontWeight={800} gutterBottom>
-            Join the Reactable network
+            Join Nexora
           </Typography>
           <Typography variant="body2" color="text.secondary">
             Connect with leading founders, architects, and designers worldwide.
@@ -134,13 +171,65 @@ const SignUpPage = () => {
               }}
             />
 
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+            <Box>
+              <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 1 }}>Which best describes you?</Typography>
+              <ToggleButtonGroup
+                exclusive
+                fullWidth
+                value={formData.accountType}
+                onChange={handleAccountTypeChange}
+                aria-label="Choose student or workplace account"
+                color="primary"
+                sx={{ '& .MuiToggleButton-root': { py: 1.1, textTransform: 'none', fontWeight: 700 } }}
+              >
+                <ToggleButton value="student">Student</ToggleButton>
+                <ToggleButton value="workplace">Workplace</ToggleButton>
+              </ToggleButtonGroup>
+            </Box>
+
+            {formData.accountType === 'student' && (
+              <Stack spacing={2}>
+                <TextField
+                  label="College or School Name"
+                  name="schoolName"
+                  fullWidth
+                  value={formData.schoolName}
+                  onChange={handleChange}
+                  required
+                  inputProps={{ maxLength: 120 }}
+                />
+                <TextField
+                  label="Course or Field of Study"
+                  name="course"
+                  fullWidth
+                  value={formData.course}
+                  onChange={handleChange}
+                  required
+                  inputProps={{ maxLength: 120 }}
+                />
+                <TextField
+                  label="Course Start Year"
+                  name="courseStartYear"
+                  type="number"
+                  fullWidth
+                  value={formData.courseStartYear}
+                  onChange={handleChange}
+                  required
+                  inputProps={{ min: 1900, max: MAX_COURSE_START_YEAR, step: 1 }}
+                />
+              </Stack>
+            )}
+
+            {formData.accountType === 'workplace' && (
+              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
               <TextField
-                label="Job Title (e.g. Lead Designer)"
+                label="Work Role or Job Title"
                 name="jobTitle"
                 fullWidth
                 value={formData.jobTitle}
                 onChange={handleChange}
+                required
+                inputProps={{ maxLength: 120 }}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -150,16 +239,19 @@ const SignUpPage = () => {
                 }}
               />
               <TextField
-                label="Company / Org"
+                label="Company or Organization"
                 name="company"
                 fullWidth
                 value={formData.company}
                 onChange={handleChange}
+                required
+                inputProps={{ maxLength: 120 }}
               />
-            </Stack>
+              </Stack>
+            )}
 
             <TextField
-              label="Password (min. 6 characters)"
+              label="Password (min. 8 characters)"
               name="password"
               type={showPassword ? 'text' : 'password'}
               fullWidth

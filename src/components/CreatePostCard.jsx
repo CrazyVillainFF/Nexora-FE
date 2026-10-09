@@ -1,7 +1,6 @@
 import React, { useState, useRef } from 'react';
 import {
   Card,
-  CardContent,
   Avatar,
   Box,
   Typography,
@@ -27,9 +26,11 @@ import { postAPI } from '../services/api';
 
 const POPULAR_TAGS = ['#engineering', '#productdesign', '#ai', '#leadership', '#techtrends'];
 
-const CreatePostCard = ({ onPostCreated }) => {
+const CreatePostCard = ({ onPostCreated, showTrigger = true, open, onOpenChange }) => {
   const { user } = useAuth();
-  const [openModal, setOpenModal] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
+  const openModal = open ?? internalOpen;
+  const setOpenModal = onOpenChange ?? setInternalOpen;
   const [content, setContent] = useState('');
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
@@ -100,7 +101,7 @@ const CreatePostCard = ({ onPostCreated }) => {
 
   return (
     <>
-      <Card sx={{ mb: 3, p: 2 }}>
+      {showTrigger && <Card sx={{ mb: 3, p: 2 }}>
         <Stack direction="row" spacing={2} alignItems="center">
           <Avatar
             src={user?.profilePicture}
@@ -166,7 +167,7 @@ const CreatePostCard = ({ onPostCreated }) => {
             Create Post
           </Button>
         </Stack>
-      </Card>
+      </Card>}
 
       {/* Expandable Composer Dialog */}
       <Dialog

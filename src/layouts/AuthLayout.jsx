@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Container, Grid, Typography, Stack, Chip, Card } from '@mui/material';
+import { Box, Container, Grid, Typography, Stack, Chip } from '@mui/material';
 import { Outlet, useNavigate } from 'react-router-dom';
 import AutoAwesomeRoundedIcon from '@mui/icons-material/AutoAwesomeRounded';
 import SecurityRoundedIcon from '@mui/icons-material/SecurityRounded';
@@ -40,7 +40,7 @@ const AuthLayout = () => {
               >
                 <ReactableMark size={44} />
                 <Typography variant="h4" fontWeight={800} letterSpacing="-0.03em">
-                  Reactable
+                  Nexora
                 </Typography>
               </Stack>
 

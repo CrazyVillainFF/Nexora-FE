@@ -138,7 +138,7 @@ const ProfilePage = () => {
       <Container maxWidth="md" sx={{ py: 6 }}>
         <ErrorState
           title="Profile Not Found"
-          message={error || 'We could not locate this profile on Reactable.'}
+          message={error || 'We could not locate this profile on Nexora.'}
           onRetry={() => navigate('/home')}
         />
       </Container>
@@ -264,7 +264,7 @@ const ProfilePage = () => {
             </Stack>
 
             <Typography variant="h6" color="text.secondary" fontWeight={500} sx={{ mt: 0.5, maxWidth: 720 }}>
-              {profile.headline || 'Professional at Reactable'}
+              {profile.headline || 'Professional at Nexora'}
             </Typography>
 
             {/* Metadata Chips: Location, Company, Website */}
@@ -373,10 +373,14 @@ const ProfilePage = () => {
                   />
                 ))}
               </Stack>
+            ) : profile.privateAccount && profile.connectionStatus !== 'connected' && !isOwnProfile ? (
+              <Alert severity="info" sx={{ borderRadius: 2 }}>
+                This account is private. Only accepted connections can view its posts.
+              </Alert>
             ) : (
               <EmptyState
                 title="No posts published yet"
-                description={`${profile.name} has not published any public discussions yet.`}
+                description={`${profile.name} has not published any discussions yet.`}
               />
             )}
           </Box>

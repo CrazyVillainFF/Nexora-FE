@@ -54,6 +54,9 @@ export const authAPI = {
   login: (data) => api.post('/auth/login', data),
   getMe: () => api.get('/auth/me'),
   updatePassword: (data) => api.put('/auth/updatepassword', data),
+  requestPasswordReset: (email) => api.post('/auth/password-reset/request', { email }),
+  verifyPasswordResetCode: (email, code) => api.post('/auth/password-reset/verify', { email, code }),
+  completePasswordReset: (data) => api.post('/auth/password-reset/complete', data),
 };
 
 // ================= USER APIs =================
@@ -116,6 +119,16 @@ export const notificationAPI = {
   markAsRead: (id) => api.put(`/notifications/${id}/read`),
   markAllAsRead: () => api.put('/notifications/read-all'),
   deleteNotification: (id) => api.delete(`/notifications/${id}`),
+};
+
+export const messageAPI = {
+  getContacts: () => api.get('/messages/contacts'),
+  getOwnKey: () => api.get('/messages/keys/me'),
+  saveOwnKey: (publicKey, signingPublicKey) => api.put('/messages/keys/me', { publicKey, signingPublicKey }),
+  getConversations: () => api.get('/messages/conversations'),
+  openConversation: (userId) => api.post(`/messages/conversations/${userId}`),
+  getMessages: (conversationId) => api.get(`/messages/conversations/${conversationId}/messages`),
+  sendMessage: (conversationId, payload) => api.post(`/messages/conversations/${conversationId}/messages`, payload),
 };
 
 export default api;

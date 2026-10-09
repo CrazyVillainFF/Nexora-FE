@@ -25,7 +25,7 @@ const LandingPage = () => {
   const primaryDestination = isAuthenticated ? '/home' : '/signup';
 
   return (
-    <Box sx={{ overflowX: 'hidden' }}>
+    <Box sx={{ minWidth: 0, width: '100%' }}>
       <Container maxWidth="xl" sx={{ pt: { xs: 3, md: 7 }, pb: { xs: 7, md: 10 }, position: 'relative' }}>
         <Grid container spacing={{ xs: 2, md: 6 }} sx={{ alignItems: 'center', minHeight: { md: 'min(690px, calc(100dvh - 100px))' } }}>
           <Grid size={{ xs: 12, md: 7 }}>

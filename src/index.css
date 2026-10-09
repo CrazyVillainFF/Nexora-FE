@@ -1,9 +1,15 @@
-:root { font-synthesis: none; text-rendering: optimizeLegibility; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
-body { margin: 0; }
-#root { min-height: 100dvh; }
+:root { box-sizing: border-box; font-synthesis: none; text-rendering: optimizeLegibility; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+*, *::before, *::after { box-sizing: inherit; }
+html, body { width: 100%; min-width: 320px; min-height: 100%; margin: 0; }
+body { overflow-x: clip; }
+#root { width: 100%; min-width: 0; min-height: 100dvh; overflow-x: clip; }
+img, video, canvas, svg { max-width: 100%; }
 .reactable-mark__electric { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
 .reactable-mark__electric--interactive { pointer-events: auto; }
 .reactable-hero-wordmark { min-height: clamp(100px, 14vw, 180px); height: clamp(100px, 14vw, 180px); }
+.MuiContainer-root, .MuiGrid-root, .MuiCard-root, .MuiPaper-root { min-width: 0; }
+.MuiCardHeader-content { min-width: 0; }
+.MuiCardHeader-title, .MuiCardHeader-subheader { overflow-wrap: anywhere; }
 .specular-button {
   min-height: 48px;
   padding: 0 24px;

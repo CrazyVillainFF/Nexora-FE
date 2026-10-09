@@ -11,22 +11,14 @@ import {
   IconButton,
   Alert,
   Divider,
-  CircularProgress,
-  Chip
+  CircularProgress
 } from '@mui/material';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import AutoAwesomeRoundedIcon from '@mui/icons-material/AutoAwesomeRounded';
 import { useAuth } from '../context/AuthContext';
-
-const DEMO_ACCOUNTS = [
-  { name: 'Elena Rostova', role: 'VP Design', email: 'elena@nexora.io' },
-  { name: 'Marcus Vance', role: 'Principal Architect', email: 'marcus@nexora.io' },
-  { name: 'Dr. Anya Sharma', role: 'Chief AI Scientist', email: 'anya@nexora.io' },
-];
 
 const SignInPage = () => {
   const [email, setEmail] = useState('');
@@ -60,18 +52,12 @@ const SignInPage = () => {
     }
   };
 
-  const fillDemo = (demoEmail) => {
-    setEmail(demoEmail);
-    setPassword('password123');
-    setError(null);
-  };
-
   return (
     <Card sx={{ p: { xs: 2.5, sm: 3.5 }, borderRadius: 3.5, boxShadow: 3 }}>
       <CardContent sx={{ p: '0 !important' }}>
         <Box sx={{ mb: 3 }}>
           <Typography variant="h5" fontWeight={800} gutterBottom>
-            Welcome back to Reactable
+            Welcome back to Nexora
           </Typography>
           <Typography variant="body2" color="text.secondary">
             Sign in to access your professional feed and network.
@@ -83,28 +69,6 @@ const SignInPage = () => {
             {error}
           </Alert>
         )}
-
-        {/* Demo Fast Logins Box */}
-        <Box sx={{ p: 1.5, mb: 2.5, bgcolor: 'action.hover', borderRadius: 2.5 }}>
-          <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1 }}>
-            <AutoAwesomeRoundedIcon sx={{ fontSize: 16, color: 'primary.main' }} />
-            <Typography variant="caption" fontWeight={700} color="primary.main">
-              1-Click Demo Profiles (Pre-seeded)
-            </Typography>
-          </Stack>
-          <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-            {DEMO_ACCOUNTS.map((acc, idx) => (
-              <Chip
-                key={idx}
-                label={`${acc.name.split(' ')[0]} (${acc.role})`}
-                size="small"
-                clickable
-                onClick={() => fillDemo(acc.email)}
-                sx={{ fontSize: '0.75rem', fontWeight: 600 }}
-              />
-            ))}
-          </Stack>
-        </Box>
 
         <form onSubmit={handleSubmit}>
           <Stack spacing={2.5}>
@@ -123,7 +87,6 @@ const SignInPage = () => {
                 ),
               }}
             />
-
             <TextField
               label="Password"
               type={showPassword ? 'text' : 'password'}
@@ -146,6 +109,11 @@ const SignInPage = () => {
                 ),
               }}
             />
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: -1.5 }}>
+              <Typography component={Link} to="/forgot-password" variant="body2" color="primary" sx={{ textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}>
+                Forgot password?
+              </Typography>
+            </Box>
 
             <Button
               type="submit"
@@ -163,7 +131,7 @@ const SignInPage = () => {
 
         <Divider sx={{ my: 3 }}>
           <Typography variant="caption" color="text.secondary">
-            NEW TO REACTABLE?
+            NEW TO NEXORA?
           </Typography>
         </Divider>
 
