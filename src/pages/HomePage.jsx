@@ -62,7 +62,7 @@ const HomePage = () => {
   const openComposer = () => window.dispatchEvent(new Event('nexora:create-post'));
 
   return (
-    <Container maxWidth="md" sx={{ minWidth: 0 }}>
+    <Container maxWidth="md" sx={{ width: '100%', maxWidth: { xs: '100%', md: '900px' }, minWidth: 0, mx: 'auto', px: { xs: 1.5, sm: 2 } }}>
       <Box sx={{ mb: 2.5, py: 0.5, minWidth: 0 }} aria-label="Filter posts by topic">
         <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
           {FILTER_TOPICS.map((tag) => (
