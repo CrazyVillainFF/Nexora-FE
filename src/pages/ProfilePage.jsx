@@ -280,7 +280,7 @@ const ProfilePage = () => {
           <Box sx={{ mt: 2 }}>
             <Stack direction="row" spacing={1} alignItems="center">
               <Typography variant="h4" fontWeight={800} letterSpacing="-0.02em">
-                {isOwnProfile ? `${profile.name} (Owner)` : profile.name}
+                {profile.name}
               </Typography>
               {isVerifiedAccount(profile) && <VerifiedRoundedIcon sx={{ fontSize: 24, color: 'primary.main' }} />}
             </Stack>
