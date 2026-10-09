@@ -261,7 +261,18 @@ const PostCard = ({ post, onPostDeleted, onPostUpdated }) => {
           anchorEl={anchorEl}
           open={Boolean(anchorEl)}
           onClose={() => setAnchorEl(null)}
-          PaperProps={{ sx: { borderRadius: 2.5, minWidth: 140 } }}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+          transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+          marginThreshold={8}
+          PaperProps={{
+            sx: {
+              borderRadius: 2.5,
+              minWidth: 160,
+              maxWidth: 'calc(100vw - 24px)',
+              boxShadow: 8,
+              border: (theme) => `1px solid ${theme.palette.divider}`,
+            },
+          }}
         >
           <MenuItem
             onClick={() => {
