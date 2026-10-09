@@ -133,6 +133,8 @@ export const messageAPI = {
   deleteConversation: (conversationId) => api.delete(`/messages/conversations/${conversationId}`),
   updateConversationName: (conversationId, name) => api.patch(`/messages/conversations/${conversationId}`, { name }),
   getMessages: (conversationId) => api.get(`/messages/conversations/${conversationId}/messages`),
+  deleteMessage: (conversationId, messageId) => api.delete(`/messages/conversations/${conversationId}/messages/${messageId}`),
+  updateMessage: (conversationId, messageId, text) => api.put(`/messages/conversations/${conversationId}/messages/${messageId}`, { text }),
   sendMessage: (conversationId, payload) => api.post(`/messages/conversations/${conversationId}/messages`, payload),
   syncLegacyMessages: (conversationId, messages) => api.post(`/messages/conversations/${conversationId}/messages/sync-legacy`, { messages }),
 };

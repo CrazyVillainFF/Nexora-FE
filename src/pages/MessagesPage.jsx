@@ -10,6 +10,8 @@ import ChatBubbleOutlineRoundedIcon from '@mui/icons-material/ChatBubbleOutlineR
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
 import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded';
 import MoreHorizRoundedIcon from '@mui/icons-material/MoreHorizRounded';
+import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
+import EditRoundedIcon from '@mui/icons-material/EditRounded';
 import EmojiPickerControl from '../components/EmojiPickerControl';
 import { useTheme } from '@mui/material/styles';
 import { useAuth } from '../context/AuthContext';
@@ -55,6 +57,10 @@ const MessagesPage = () => {
   const [chatNameDraft, setChatNameDraft] = useState('');
   const [chatToDelete, setChatToDelete] = useState(null);
   const [chatActionLoading, setChatActionLoading] = useState(false);
+  const [messageToEdit, setMessageToEdit] = useState(null);
+  const [messageEditDraft, setMessageEditDraft] = useState('');
+  const [messageToDelete, setMessageToDelete] = useState(null);
+  const [messageActionLoading, setMessageActionLoading] = useState(false);
   const bottomRef = useRef(null);
   const searchRef = useRef(null);
   const composerInputRef = useRef(null);
@@ -123,6 +129,55 @@ const MessagesPage = () => {
       setError(actionError.message || 'Could not delete this chat.');
     } finally {
       setChatActionLoading(false);
+    }
+  };
+
+  const editMessage = async () => {
+    if (!active || !messageToEdit || !messageEditDraft.trim()) return;
+    const conversationId = active._id;
+    const messageId = messageToEdit._id;
+    setMessageActionLoading(true);
+    try {
+      const { data } = await messageAPI.updateMessage(conversationId, messageId, messageEditDraft.trim());
+      setMessages((existing) => existing.map((message) => (
+        String(message._id) === String(messageId)
+          ? { ...message, text: data.message.text, updatedAt: data.message.updatedAt, editedAt: data.message.editedAt }
+          : message
+      )));
+      setMessageToEdit(null);
+      setMessageEditDraft('');
+      try {
+        const response = await messageAPI.getConversations();
+        setConversations(response.data.conversations || []);
+      } catch {
+        // Keep the edited bubble visible if inbox previews cannot refresh.
+      }
+    } catch (actionError) {
+      setError(actionError.message || 'Could not edit this message.');
+    } finally {
+      setMessageActionLoading(false);
+    }
+  };
+
+  const deleteMessage = async () => {
+    if (!active || !messageToDelete) return;
+    const conversationId = active._id;
+    const messageId = messageToDelete._id;
+    setMessageActionLoading(true);
+    try {
+      await messageAPI.deleteMessage(conversationId, messageId);
+      setMessages((existing) => existing.filter((message) => String(message._id) !== String(messageId)));
+      setMessageToDelete(null);
+      try {
+        const response = await messageAPI.getConversations();
+        setConversations(response.data.conversations || []);
+      } catch {
+        // Keep the message deleted locally even if inbox previews cannot refresh.
+      }
+    } catch (actionError) {
+      setError(actionError.message || 'Could not delete this message.');
+    } finally {
+      setMessageActionLoading(false);
     }
   };
 
@@ -503,7 +558,7 @@ const MessagesPage = () => {
                           primaryTypographyProps={{ noWrap: true, fontWeight: 650 }}
                           secondaryTypographyProps={{ noWrap: true, fontSize: '0.78rem', color: 'text.secondary' }}
                         />
-                        <Stack alignItems="flex-end" sx={{ pl: 1, minWidth: 0 }}>
+                        <Stack alignItems="flex-end" sx={{ pl: 1, pr: 1, minWidth: 0 }}>
                           {hasMessages && <Typography variant="caption" color="text.secondary" noWrap>{formatConversationTime(conversation.lastMessageAt || conversation.lastMessage.createdAt)}</Typography>}
                         </Stack>
                       </ListItemButton>
@@ -549,13 +604,23 @@ const MessagesPage = () => {
                     const ownMessage = message.sender.toString() === user._id.toString();
                     const readByPeer = message.readBy?.some((id) => id.toString() === active.peer._id.toString());
                     return (
-                      <Box key={message._id} sx={{ alignSelf: ownMessage ? 'flex-end' : 'flex-start', maxWidth: 'min(82%, 560px)', minWidth: 0 }}>
-                        <Paper elevation={0} sx={{ px: 1.5, py: 1.1, borderRadius: 2.5, bgcolor: ownMessage ? 'primary.main' : 'action.hover', color: ownMessage ? 'primary.contrastText' : 'text.primary', overflowWrap: 'anywhere' }}>
-                          <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>{message.text}</Typography>
-                        </Paper>
-                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', textAlign: ownMessage ? 'right' : 'left', mt: 0.4 }}>
-                          {formatTimestamp(message.createdAt)}{ownMessage ? ` · ${message.pending ? 'Sending…' : readByPeer ? 'Read' : 'Sent'}` : ''}
-                        </Typography>
+                      <Box key={message._id} sx={{ alignSelf: ownMessage ? 'flex-end' : 'flex-start', maxWidth: 'min(90%, 560px)', minWidth: 0 }}>
+                        <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center', justifyContent: ownMessage ? 'flex-end' : 'flex-start' }}>
+                          <Paper elevation={0} sx={{ px: 1.5, py: 1.1, borderRadius: 2.5, bgcolor: ownMessage ? 'primary.main' : 'action.hover', color: ownMessage ? 'primary.contrastText' : 'text.primary', overflowWrap: 'anywhere' }}>
+                            <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>{message.text}</Typography>
+                          </Paper>
+                        </Box>
+                        <Stack direction="row" spacing={0.25} alignItems="center" justifyContent={ownMessage ? 'flex-end' : 'flex-start'} sx={{ mt: 0.25 }}>
+                          <Typography variant="caption" color="text.secondary">
+                            {formatTimestamp(message.createdAt)}{message.editedAt ? ' · Edited' : ''}{ownMessage ? ` · ${message.pending ? 'Sending…' : readByPeer ? 'Read' : 'Sent'}` : ''}
+                          </Typography>
+                          {ownMessage && !message.pending && (
+                            <>
+                              {!message.ciphertext && typeof message.text === 'string' && <IconButton size="small" aria-label="Edit message" onClick={() => { setMessageToEdit(message); setMessageEditDraft(message.text || ''); }} sx={{ p: 0.35 }}><EditRoundedIcon sx={{ fontSize: 17 }} /></IconButton>}
+                              <IconButton size="small" aria-label="Delete message" onClick={() => setMessageToDelete(message)} sx={{ p: 0.35, color: 'error.light' }}><DeleteOutlineRoundedIcon sx={{ fontSize: 17 }} /></IconButton>
+                            </>
+                          )}
+                        </Stack>
                       </Box>
                     );
                   })}
@@ -627,6 +692,24 @@ const MessagesPage = () => {
         <DialogActions>
           <Button onClick={() => setChatToDelete(null)} disabled={chatActionLoading}>Cancel</Button>
           <Button color="error" onClick={deleteChat} disabled={chatActionLoading}>{chatActionLoading ? 'Deleting…' : 'Delete chat'}</Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog open={Boolean(messageToEdit)} onClose={() => !messageActionLoading && setMessageToEdit(null)} fullWidth maxWidth="xs">
+        <DialogTitle>Edit message</DialogTitle>
+        <DialogContent>
+          <TextField autoFocus fullWidth multiline maxRows={6} label="Message" value={messageEditDraft} onChange={(event) => setMessageEditDraft(event.target.value.slice(0, 5000))} inputProps={{ maxLength: 5000 }} sx={{ mt: 1 }} />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setMessageToEdit(null)} disabled={messageActionLoading}>Cancel</Button>
+          <Button onClick={editMessage} disabled={messageActionLoading || !messageEditDraft.trim()}>{messageActionLoading ? 'Saving…' : 'Save'}</Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog open={Boolean(messageToDelete)} onClose={() => !messageActionLoading && setMessageToDelete(null)} fullWidth maxWidth="xs">
+        <DialogTitle>Delete this message?</DialogTitle>
+        <DialogContent><Typography color="text.secondary">This removes your message from the conversation for both people.</Typography></DialogContent>
+        <DialogActions>
+          <Button onClick={() => setMessageToDelete(null)} disabled={messageActionLoading}>Cancel</Button>
+          <Button color="error" onClick={deleteMessage} disabled={messageActionLoading}>{messageActionLoading ? 'Deleting…' : 'Delete'}</Button>
         </DialogActions>
       </Dialog>
     </Container>
