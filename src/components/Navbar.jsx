@@ -37,7 +37,7 @@ import ReactableMark from './ReactableMark';
 
 const Navbar = () => {
   const { user, isAuthenticated, logout } = useAuth();
-  const { unreadCount } = useNotifications();
+  const { unreadCount, unreadMessageCount } = useNotifications();
   const { mode, toggleTheme } = useThemeMode();
   const compactHeader = useMediaQuery((theme) => theme.breakpoints.down('sm'));
   const navigate = useNavigate();
@@ -56,7 +56,7 @@ const Navbar = () => {
 
   const navItems = [
     { label: 'Feed', path: '/home', icon: HomeRoundedIcon },
-    { label: 'Message', path: '/messages', icon: ChatBubbleOutlineRoundedIcon },
+    { label: 'Message', path: '/messages', icon: ChatBubbleOutlineRoundedIcon, badge: unreadMessageCount },
     { label: 'Network', path: '/people', icon: PeopleAltRoundedIcon },
     {
       label: 'Notifications',

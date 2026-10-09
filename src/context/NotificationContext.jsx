@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { notificationAPI } from '../services/api';
+import { messageAPI, notificationAPI } from '../services/api';
 import { useAuth } from './AuthContext';
 
 const NotificationContext = createContext();
@@ -8,6 +8,7 @@ export const NotificationProvider = ({ children }) => {
   const { isAuthenticated } = useAuth();
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [unreadMessagesByConversation, setUnreadMessagesByConversation] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -35,6 +36,32 @@ export const NotificationProvider = ({ children }) => {
     }
   }, [isAuthenticated]);
 
+  const fetchUnreadMessages = useCallback(async () => {
+    if (!isAuthenticated) {
+      setUnreadMessagesByConversation({});
+      return;
+    }
+    try {
+      const response = await messageAPI.getConversations();
+      const unread = Object.fromEntries((response.data.conversations || [])
+        .filter((conversation) => conversation.unreadCount > 0)
+        .map((conversation) => [String(conversation._id), conversation.unreadCount]));
+      setUnreadMessagesByConversation(unread);
+    } catch (err) {
+      console.error('[Messages] Failed to load unread count:', err.message);
+    }
+  }, [isAuthenticated]);
+
+  const markConversationMessagesRead = useCallback((conversationId) => {
+    setUnreadMessagesByConversation((current) => {
+      const id = String(conversationId);
+      if (!current[id]) return current;
+      const next = { ...current };
+      delete next[id];
+      return next;
+    });
+  }, []);
+
   useEffect(() => {
     fetchNotifications();
 
@@ -44,6 +71,17 @@ export const NotificationProvider = ({ children }) => {
       return () => clearInterval(interval);
     }
   }, [fetchNotifications, isAuthenticated]);
+
+  useEffect(() => {
+    fetchUnreadMessages();
+    if (isAuthenticated) {
+      const interval = setInterval(fetchUnreadMessages, 10000);
+      return () => clearInterval(interval);
+    }
+  }, [fetchUnreadMessages, isAuthenticated]);
+
+  const unreadMessageCount = Object.values(unreadMessagesByConversation)
+    .reduce((total, count) => total + count, 0);
 
   const markAsRead = async (id) => {
     try {
@@ -91,10 +129,13 @@ export const NotificationProvider = ({ children }) => {
       value={{
         notifications,
         unreadCount,
+        unreadMessageCount,
         loading,
         error,
         clearError: () => setError(''),
         fetchNotifications,
+        fetchUnreadMessages,
+        markConversationMessagesRead,
         markAsRead,
         markAllAsRead,
         deleteNotification

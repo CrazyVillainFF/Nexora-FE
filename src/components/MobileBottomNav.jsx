@@ -13,7 +13,7 @@ import CreatePostCard from './CreatePostCard';
 const MobileBottomNav = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { unreadCount } = useNotifications();
+  const { unreadCount, unreadMessageCount } = useNotifications();
   const { user, isAuthenticated } = useAuth();
   const [createOpen, setCreateOpen] = useState(false);
 
@@ -72,7 +72,14 @@ const MobileBottomNav = () => {
           }}
         >
           <BottomNavigationAction label="Home" value="/home" aria-label="Home" icon={<HomeRoundedIcon />} />
-          <BottomNavigationAction label="Message" value="/messages" aria-label="Messages" icon={<ChatBubbleOutlineRoundedIcon />} />
+          <BottomNavigationAction
+            label="Message"
+            value="/messages"
+            aria-label={`Messages${unreadMessageCount ? `, ${unreadMessageCount} unread` : ''}`}
+            icon={unreadMessageCount > 0
+              ? <Badge badgeContent={unreadMessageCount} color="error" max={99}><ChatBubbleOutlineRoundedIcon /></Badge>
+              : <ChatBubbleOutlineRoundedIcon />}
+          />
           <BottomNavigationAction
             label=""
             value="create"

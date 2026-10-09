@@ -14,6 +14,7 @@ import { useTheme } from '@mui/material/styles';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { messageAPI } from '../services/api';
+import { useNotifications } from '../context/NotificationContext';
 import { decryptMessage, getDeviceKeyPair } from '../utils/e2ee';
 import { sortContactsByRecentConversations } from '../utils/messageInbox';
 
@@ -30,6 +31,7 @@ const formatConversationTime = (value) => {
 
 const MessagesPage = () => {
   const { user } = useAuth();
+  const { markConversationMessagesRead } = useNotifications();
   const navigate = useNavigate();
   const userId = user?._id;
   const theme = useTheme();
@@ -64,6 +66,7 @@ const MessagesPage = () => {
       const response = await messageAPI.getMessages(conversationId);
       const fetchedMessages = response.data.messages || [];
       if (requestId !== messageRequestId.current || selectedConversationId.current !== conversationId) return;
+      markConversationMessagesRead(conversationId);
       const legacyMessages = fetchedMessages.filter((message) => (
         typeof message.text !== 'string' && !legacyTextCacheRef.current.has(String(message._id))
       ));
@@ -116,7 +119,7 @@ const MessagesPage = () => {
       setError(requestError.message || 'Unable to load this conversation.');
       setLoadingMessages(false);
     }
-  }, [userId, ownSigningPublicKey]);
+  }, [userId, ownSigningPublicKey, markConversationMessagesRead]);
 
   useEffect(() => {
     let cancelled = false;
