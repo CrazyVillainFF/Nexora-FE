@@ -21,9 +21,8 @@ import {
   Snackbar,
   Alert
 } from '@mui/material';
-import FavoriteBorderRoundedIcon from '@mui/icons-material/FavoriteBorderRounded';
 import { getBrandedHeadline } from '../utils/brandCopy';
-import FavoriteRoundedIcon from '@mui/icons-material/FavoriteRounded';
+import PulseHeart from './reactbits/PulseHeart';
 import ChatBubbleOutlineRoundedIcon from '@mui/icons-material/ChatBubbleOutlineRounded';
 import ShareOutlinedIcon from '@mui/icons-material/ShareOutlined';
 import MoreVertRoundedIcon from '@mui/icons-material/MoreVertRounded';
@@ -72,23 +71,22 @@ const PostCard = ({ post, onPostDeleted, onPostUpdated }) => {
   const author = post.author || {};
   const isAuthor = currentUser && currentUser._id === (typeof author === 'string' ? author : author._id);
 
-  const handleLikeToggle = async () => {
+  const handleLikeToggle = async (nextLiked, nextCount) => {
     if (!isAuthenticated) {
       navigate('/signin');
       return;
     }
 
-    // Optimistic update
-    const nextLiked = !isLiked;
+    const previousLiked = isLiked;
+    const previousCount = likeCount;
     setIsLiked(nextLiked);
-    setLikeCount((prev) => (nextLiked ? prev + 1 : Math.max(0, prev - 1)));
+    setLikeCount(nextCount);
 
     try {
       await postAPI.toggleLike(post._id);
     } catch (err) {
-      // Revert on failure
-      setIsLiked(!nextLiked);
-      setLikeCount((prev) => (!nextLiked ? prev + 1 : Math.max(0, prev - 1)));
+      setIsLiked(previousLiked);
+      setLikeCount(previousCount);
       console.error('[Like Error]', err.message);
     }
   };
@@ -420,24 +418,20 @@ const PostCard = ({ post, onPostDeleted, onPostUpdated }) => {
 
         {/* Action Buttons */}
         <CardActions sx={{ px: 1, py: 0.5, justifyContent: 'space-around' }}>
-          <Button
-            size="small"
-            startIcon={
-              isLiked ? (
-                <FavoriteRoundedIcon sx={{ color: '#EF4444', animation: 'pulse 0.3s' }} />
-              ) : (
-                <FavoriteBorderRoundedIcon />
-              )
-            }
-            onClick={handleLikeToggle}
-            sx={{
-              color: isLiked ? '#EF4444' : 'text.secondary',
-              fontWeight: 600,
-              flex: 1,
-            }}
-          >
-            Like
-          </Button>
+          <PulseHeart
+            liked={isLiked}
+            count={likeCount}
+            onChange={handleLikeToggle}
+            showCount={false}
+            size={20}
+            corner={12}
+            likedColor="#EF4444"
+            idleColor="#81909E"
+            pillColor="transparent"
+            textColor="#81909E"
+            label={isAuthenticated ? 'Like' : 'Sign in to like'}
+            className="post-like-heart"
+          />
 
           <Button
             size="small"
@@ -588,7 +582,7 @@ const PostCard = ({ post, onPostDeleted, onPostUpdated }) => {
                               size="small"
                               value={editingCommentText}
                               onChange={(event) => setEditingCommentText(event.target.value.slice(0, 1000))}
-                              inputProps={{ maxLength: 1000, 'aria-label': 'Edit comment text' }}
+                              slotProps={{ htmlInput: { maxLength: 1000, 'aria-label': 'Edit comment text' } }}
                               disabled={savingComment}
                             />
                             <Stack direction="row" justifyContent="flex-end" spacing={0.5} sx={{ mt: 0.5 }}>

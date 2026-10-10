@@ -15,6 +15,9 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(() => localStorage.getItem('nexora_token'));
   const [loading, setLoading] = useState(true);
   const [authError, setAuthError] = useState(null);
+  const [welcomeMessage, setWelcomeMessage] = useState('');
+
+  const clearWelcomeMessage = useCallback(() => setWelcomeMessage(''), []);
 
   const logout = useCallback(() => {
     localStorage.removeItem('nexora_token');
@@ -66,6 +69,7 @@ export const AuthProvider = ({ children }) => {
 
       setToken(receivedToken);
       setUser(receivedUser);
+      setWelcomeMessage('Welcome back to Vuprise');
       return { success: true, user: receivedUser };
     } catch (err) {
       const msg = err.message || 'Login failed. Please check your credentials.';
@@ -86,6 +90,7 @@ export const AuthProvider = ({ children }) => {
 
       setToken(receivedToken);
       setUser(receivedUser);
+      setWelcomeMessage('Welcome to Vuprise');
       return { success: true, user: receivedUser };
     } catch (err) {
       const msg = err.message || 'Registration failed. Please try again.';
@@ -108,6 +113,8 @@ export const AuthProvider = ({ children }) => {
     token,
     loading,
     authError,
+    welcomeMessage,
+    clearWelcomeMessage,
     isAuthenticated: !!token && !!user,
     login,
     register,

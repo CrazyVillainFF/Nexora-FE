@@ -496,10 +496,9 @@ const MessagesPage = () => {
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
                 placeholder="Search chats"
-                inputProps={{ 'aria-label': 'Search accepted connections' }}
-                InputProps={{
+                slotProps={{ htmlInput: { 'aria-label': 'Search accepted connections' }, input: {
                   startAdornment: <InputAdornment position="start"><SearchRoundedIcon fontSize="small" color="action" /></InputAdornment>,
-                }}
+                }}}
                 sx={{ '& .MuiOutlinedInput-root': { borderRadius: 5, bgcolor: 'action.hover' } }}
               />
             </Box>
@@ -644,7 +643,7 @@ const MessagesPage = () => {
                     onInput={(event) => setDraft(event.currentTarget.value.slice(0, 5000))}
                     onFocus={(event) => setDraft(event.currentTarget.value.slice(0, 5000))}
                     onKeyDown={handleComposerKeyDown}
-                    inputProps={{ maxLength: 5000, name: 'message' }}
+                    slotProps={{ htmlInput: { maxLength: 5000, name: 'message' } }}
                     placeholder="Write a message..."
                   />
                   <Button type="submit" variant="contained" aria-label="Send message" disabled={sending} sx={{ minWidth: 48, width: 48, height: 40, px: 0 }}>
@@ -682,7 +681,7 @@ const MessagesPage = () => {
       <Dialog open={Boolean(chatToEdit)} onClose={() => !chatActionLoading && setChatToEdit(null)} fullWidth maxWidth="xs">
         <DialogTitle>Edit chat name</DialogTitle>
         <DialogContent>
-          <TextField autoFocus fullWidth label="Chat name" value={chatNameDraft} onChange={(event) => setChatNameDraft(event.target.value.slice(0, 80))} inputProps={{ maxLength: 80 }} helperText="Leave blank to use the person’s profile name." sx={{ mt: 1 }} />
+          <TextField autoFocus fullWidth label="Chat name" value={chatNameDraft} onChange={(event) => setChatNameDraft(event.target.value.slice(0, 80))} slotProps={{ htmlInput: { maxLength: 80 } }} helperText="Leave blank to use the person’s profile name." sx={{ mt: 1 }} />
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setChatToEdit(null)} disabled={chatActionLoading}>Cancel</Button>
@@ -702,7 +701,7 @@ const MessagesPage = () => {
       <Dialog open={Boolean(messageToEdit)} onClose={() => !messageActionLoading && setMessageToEdit(null)} fullWidth maxWidth="xs">
         <DialogTitle>Edit message</DialogTitle>
         <DialogContent>
-          <TextField autoFocus fullWidth multiline maxRows={6} label="Message" value={messageEditDraft} onChange={(event) => setMessageEditDraft(event.target.value.slice(0, 5000))} inputProps={{ maxLength: 5000 }} sx={{ mt: 1 }} />
+          <TextField autoFocus fullWidth multiline maxRows={6} label="Message" value={messageEditDraft} onChange={(event) => setMessageEditDraft(event.target.value.slice(0, 5000))} slotProps={{ htmlInput: { maxLength: 5000 } }} sx={{ mt: 1 }} />
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setMessageToEdit(null)} disabled={messageActionLoading}>Cancel</Button>

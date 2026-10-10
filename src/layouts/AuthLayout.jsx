@@ -33,10 +33,9 @@ const AuthLayout = () => {
               {/* Brand Header */}
               <Stack
                 direction="row"
-                alignItems="center"
                 spacing={1.5}
                 onClick={() => navigate('/')}
-                sx={{ cursor: 'pointer', mb: 3 }}
+                sx={{ alignItems: 'center', cursor: 'pointer', mb: 3 }}
               >
                 <ReactableMark size={44} />
                 <Typography variant="h4" fontWeight={800} letterSpacing="-0.03em">
@@ -67,7 +66,7 @@ const AuthLayout = () => {
 
               {/* Benefit highlights */}
               <Stack spacing={2.5}>
-                <Stack direction="row" spacing={2} alignItems="center">
+                <Stack direction="row" spacing={2} sx={{ alignItems: 'center' }}>
                   <Box
                     sx={{
                       p: 1.25,
@@ -89,7 +88,7 @@ const AuthLayout = () => {
                   </Box>
                 </Stack>
 
-                <Stack direction="row" spacing={2} alignItems="center">
+                <Stack direction="row" spacing={2} sx={{ alignItems: 'center' }}>
                   <Box
                     sx={{
                       p: 1.25,

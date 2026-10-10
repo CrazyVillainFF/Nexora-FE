@@ -93,14 +93,14 @@ const SearchPage = () => {
             placeholder="Search people by name, skill, company, or search post discussions..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            InputProps={{
+            slotProps={{ input: {
               startAdornment: (
                 <InputAdornment position="start">
                   <SearchRoundedIcon sx={{ color: 'text.secondary' }} />
                 </InputAdornment>
               ),
               sx: { borderRadius: 2.5 }
-            }}
+            }}}
           />
         </form>
       </Card>

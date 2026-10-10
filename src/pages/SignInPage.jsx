@@ -79,13 +79,13 @@ const SignInPage = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              InputProps={{
+              slotProps={{ input: {
                 startAdornment: (
                   <InputAdornment position="start">
                     <EmailOutlinedIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
                   </InputAdornment>
                 ),
-              }}
+              }}}
             />
             <TextField
               label="Password"
@@ -94,7 +94,7 @@ const SignInPage = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              InputProps={{
+              slotProps={{ input: {
                 startAdornment: (
                   <InputAdornment position="start">
                     <LockOutlinedIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
@@ -114,7 +114,7 @@ const SignInPage = () => {
                     </IconButton>
                   </InputAdornment>
                 ),
-              }}
+              }}}
             />
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: -1.5 }}>
               <Typography component={Link} to="/forgot-password" variant="body2" color="primary" sx={{ textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}>

@@ -1,12 +1,22 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Box } from '@mui/material';
 import { Outlet } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
 import MobileBottomNav from '../components/MobileBottomNav';
 import SiteBackdrop from '../components/SiteBackdrop';
 import LocationOnboardingDialog from '../components/LocationOnboardingDialog';
+import WelcomeMoment from '../components/WelcomeMoment';
 
 const MainLayout = () => {
+  const { welcomeMessage, clearWelcomeMessage } = useAuth();
+
+  useEffect(() => {
+    if (!welcomeMessage) return undefined;
+    const timeout = window.setTimeout(clearWelcomeMessage, 4500);
+    return () => window.clearTimeout(timeout);
+  }, [welcomeMessage, clearWelcomeMessage]);
+
   return (
     <Box sx={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column', position: 'relative', isolation: 'isolate', zIndex: 1 }}>
       <SiteBackdrop />
@@ -26,6 +36,7 @@ const MainLayout = () => {
         <Outlet />
       </Box>
       <MobileBottomNav />
+      <WelcomeMoment message={welcomeMessage} />
       <LocationOnboardingDialog />
     </Box>
   );

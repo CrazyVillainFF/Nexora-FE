@@ -78,7 +78,7 @@ const ForgotPasswordPage = () => {
         {step === 'verify' && (
           <Box component="form" onSubmit={verifyCode}>
             <Stack spacing={2}>
-              <TextField label="Six-digit code" value={code} onChange={(event) => setCode(event.target.value.replace(/\D/g, '').slice(0, 6))} required fullWidth inputProps={{ inputMode: 'numeric', autoComplete: 'one-time-code', maxLength: 6, pattern: '[0-9]{6}' }} />
+              <TextField label="Six-digit code" value={code} onChange={(event) => setCode(event.target.value.replace(/\D/g, '').slice(0, 6))} required fullWidth slotProps={{ htmlInput: { inputMode: 'numeric', autoComplete: 'one-time-code', maxLength: 6, pattern: '[0-9]{6}' } }} />
               <Button type="submit" variant="contained" disabled={busy || code.length !== 6}>{busy ? <CircularProgress size={22} color="inherit" /> : 'Verify code'}</Button>
               <Button type="button" variant="text" onClick={() => { setCode(''); setStep('request'); }} disabled={busy}>Use another email or request a new code</Button>
             </Stack>
@@ -88,8 +88,8 @@ const ForgotPasswordPage = () => {
         {step === 'password' && (
           <Box component="form" onSubmit={savePassword}>
             <Stack spacing={2}>
-              <PasswordTextField label="New password" value={newPassword} onChange={(event) => setNewPassword(event.target.value)} required fullWidth autoComplete="new-password" inputProps={{ minLength: 8, maxLength: 128 }} />
-              <PasswordTextField label="Confirm new password" value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} required fullWidth autoComplete="new-password" inputProps={{ minLength: 8, maxLength: 128 }} />
+              <PasswordTextField label="New password" value={newPassword} onChange={(event) => setNewPassword(event.target.value)} required fullWidth autoComplete="new-password" slotProps={{ htmlInput: { minLength: 8, maxLength: 128 } }} />
+              <PasswordTextField label="Confirm new password" value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} required fullWidth autoComplete="new-password" slotProps={{ htmlInput: { minLength: 8, maxLength: 128 } }} />
               <Button type="submit" variant="contained" disabled={busy || newPassword.length < 8 || newPassword !== confirmPassword}>{busy ? <CircularProgress size={22} color="inherit" /> : 'Save new password'}</Button>
             </Stack>
           </Box>

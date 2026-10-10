@@ -146,13 +146,13 @@ const SignUpPage = () => {
               value={formData.name}
               onChange={handleChange}
               required
-              InputProps={{
+              slotProps={{ input: {
                 startAdornment: (
                   <InputAdornment position="start">
                     <PersonOutlineRoundedIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
                   </InputAdornment>
                 ),
-              }}
+              }}}
             />
 
             <TextField
@@ -163,13 +163,13 @@ const SignUpPage = () => {
               value={formData.email}
               onChange={handleChange}
               required
-              InputProps={{
+              slotProps={{ input: {
                 startAdornment: (
                   <InputAdornment position="start">
                     <EmailOutlinedIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
                   </InputAdornment>
                 ),
-              }}
+              }}}
             />
 
             <Box>
@@ -197,7 +197,7 @@ const SignUpPage = () => {
                   value={formData.schoolName}
                   onChange={handleChange}
                   required
-                  inputProps={{ maxLength: 120 }}
+                  slotProps={{ htmlInput: { maxLength: 120 } }}
                 />
                 <TextField
                   label="Course or Field of Study"
@@ -206,7 +206,7 @@ const SignUpPage = () => {
                   value={formData.course}
                   onChange={handleChange}
                   required
-                  inputProps={{ maxLength: 120 }}
+                  slotProps={{ htmlInput: { maxLength: 120 } }}
                 />
                 <TextField
                   label="Course Start Year"
@@ -216,7 +216,7 @@ const SignUpPage = () => {
                   value={formData.courseStartYear}
                   onChange={handleChange}
                   required
-                  inputProps={{ min: 1900, max: MAX_COURSE_START_YEAR, step: 1 }}
+                  slotProps={{ htmlInput: { min: 1900, max: MAX_COURSE_START_YEAR, step: 1 } }}
                 />
               </Stack>
             )}
@@ -230,14 +230,13 @@ const SignUpPage = () => {
                 value={formData.jobTitle}
                 onChange={handleChange}
                 required
-                inputProps={{ maxLength: 120 }}
-                InputProps={{
+                slotProps={{ htmlInput: { maxLength: 120 }, input: {
                   startAdornment: (
                     <InputAdornment position="start">
                       <BusinessCenterOutlinedIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
                     </InputAdornment>
                   ),
-                }}
+                }}}
               />
               <TextField
                 label="Company or Organization"
@@ -246,7 +245,7 @@ const SignUpPage = () => {
                 value={formData.company}
                 onChange={handleChange}
                 required
-                inputProps={{ maxLength: 120 }}
+                slotProps={{ htmlInput: { maxLength: 120 } }}
               />
               </Stack>
             )}
@@ -259,7 +258,7 @@ const SignUpPage = () => {
               value={formData.password}
               onChange={handleChange}
               required
-              InputProps={{
+              slotProps={{ input: {
                 startAdornment: (
                   <InputAdornment position="start">
                     <LockOutlinedIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
@@ -279,7 +278,7 @@ const SignUpPage = () => {
                     </IconButton>
                   </InputAdornment>
                 ),
-              }}
+              }}}
             />
 
             <TextField
@@ -290,7 +289,7 @@ const SignUpPage = () => {
               value={formData.confirmPassword}
               onChange={handleChange}
               required
-              InputProps={{
+              slotProps={{ input: {
                 startAdornment: (
                   <InputAdornment position="start">
                     <LockOutlinedIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
@@ -310,7 +309,7 @@ const SignUpPage = () => {
                     </IconButton>
                   </InputAdornment>
                 ),
-              }}
+              }}}
             />
 
             <Button
@@ -342,7 +341,7 @@ const SignUpPage = () => {
               variant="body2"
               color="primary"
               fontWeight={700}
-              sx={{ textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
+              sx={{ textDecoration: 'underline', textUnderlineOffset: '0.15em' }}
             >
               Sign In
             </Typography>

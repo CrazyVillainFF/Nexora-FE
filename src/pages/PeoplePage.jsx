@@ -170,13 +170,13 @@ const PeoplePage = () => {
               placeholder="Search by name, company, title, or skill..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              InputProps={{
+              slotProps={{ input: {
                 startAdornment: (
                   <InputAdornment position="start">
                     <SearchRoundedIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
                   </InputAdornment>
                 ),
-              }}
+              }}}
               sx={{ maxWidth: { xs: '100%', md: 380 }, bgcolor: 'background.paper', borderRadius: 2 }}
             />
 

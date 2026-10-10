@@ -1,0 +1,166 @@
+import { test, expect } from '@playwright/test';
+import AxeBuilder from '@axe-core/playwright';
+
+const publicRoutes = [
+  ['/', /Make the right connections/i],
+  ['/signin', /Welcome back to Vuprise/i],
+  ['/signup', /Join Vuprise/i],
+  ['/forgot-password', /Reset your password/i],
+];
+
+test('public routes render without uncaught errors or failed local assets', async ({ page }) => {
+  const errors = [];
+  const failedLocalRequests = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  page.on('requestfailed', (request) => {
+    if (request.url().startsWith('http://127.0.0.1:5173/')) failedLocalRequests.push(request.url());
+  });
+
+  for (const [route, heading] of publicRoutes) {
+    await page.goto(route, { waitUntil: 'domcontentloaded' });
+    await expect(page.getByText(heading).first()).toBeVisible();
+    await expect(page.locator('body')).not.toContainText('Internal Server Error');
+  }
+
+  expect(errors).toEqual([]);
+  expect(failedLocalRequests).toEqual([]);
+});
+
+test('sign-in validates empty submission and password visibility works', async ({ page }) => {
+  await page.goto('/signin');
+  const email = page.getByRole('textbox', { name: 'Email Address' });
+  const password = page.getByRole('textbox', { name: 'Password' });
+  await expect(password).toHaveAttribute('type', 'password');
+  await page.getByRole('button', { name: 'Show password' }).click();
+  await expect(password).toHaveAttribute('type', 'text');
+  await page.getByRole('button', { name: 'Hide password' }).click();
+  await expect(password).toHaveAttribute('type', 'password');
+  await page.getByRole('button', { name: 'Sign In' }).click();
+  expect(await email.evaluate((element) => element.validity.valueMissing)).toBe(true);
+  await expect(email).toBeFocused();
+});
+
+test('registration reveals both passwords and switches account-specific fields', async ({ page }) => {
+  await page.goto('/signup');
+  const password = page.locator('input[name="password"]');
+  const confirm = page.locator('input[name="confirmPassword"]');
+  await page.getByRole('button', { name: 'Show password' }).click();
+  await expect(password).toHaveAttribute('type', 'text');
+  await page.getByRole('button', { name: 'Show confirm password' }).click();
+  await expect(confirm).toHaveAttribute('type', 'text');
+  await page.getByRole('button', { name: 'Student' }).click();
+  await expect(page.getByLabel('College or School Name')).toBeVisible();
+  await page.getByRole('button', { name: 'Workplace' }).click();
+  await expect(page.getByLabel('Work Role or Job Title')).toBeVisible();
+  await expect(page.getByLabel('Company or Organization')).toBeVisible();
+});
+
+test('protected deep links send visitors to sign-in and unknown routes show a 404', async ({ page }) => {
+  for (const route of ['/home', '/messages', '/people', '/notifications', '/settings']) {
+    await page.goto(route);
+    await expect(page).toHaveURL(/\/signin$/);
+  }
+  await page.goto('/this-route-does-not-exist');
+  await expect(page.getByText('Page Not Found')).toBeVisible();
+});
+
+test('isolated seeded account can sign in and protected pages survive direct loads and refreshes', async ({ page }) => {
+  test.setTimeout(150_000);
+  await page.goto('/signin');
+  await page.getByRole('textbox', { name: 'Email Address' }).fill('elena@nexora.io');
+  await page.getByRole('textbox', { name: 'Password' }).fill('password123');
+  await page.getByRole('button', { name: 'Sign In' }).click();
+  await expect(page).toHaveURL(/\/home$/);
+  await expect(page.locator('main')).toBeVisible();
+
+  // Exercise the animated Like control once in the shared isolated test database.
+  // Keeping the toggle paired restores the seed post for later projects/runs.
+  if (test.info().project.name === 'edge') {
+    const welcome = page.getByRole('status');
+    await expect(welcome).toContainText('Welcome back to Vuprise');
+    await expect(welcome).toBeVisible();
+    await page.waitForTimeout(3600);
+    await expect(welcome).toBeVisible();
+    await expect(welcome).toBeHidden({ timeout: 6000 });
+
+    const like = page.locator('.post-like-heart').first();
+    await expect(like).toBeVisible();
+    await expect(like.locator('.pulse-heart__sr')).toHaveText('Like');
+    await expect.poll(() => like.evaluate((button) => getComputedStyle(button.querySelector('.pulse-heart__pill'), '::after').content)).toBe('"Like"');
+    const originalLiked = await like.getAttribute('aria-pressed');
+    await like.click();
+    await expect(like).toHaveAttribute('aria-pressed', originalLiked === 'true' ? 'false' : 'true');
+    await page.waitForTimeout(600);
+    await like.click();
+    await expect(like).toHaveAttribute('aria-pressed', originalLiked);
+  }
+
+  const country = page.getByRole('combobox', { name: 'Country' });
+  if (await country.isVisible()) {
+    await expect(country).toBeEnabled();
+    await country.fill('India');
+    await page.getByRole('option', { name: 'India', exact: true }).click();
+    const region = page.getByRole('combobox', { name: 'State / Province / Region' });
+    await expect(region).toBeEnabled();
+    await region.fill('Tamil Nadu');
+    await page.getByRole('option', { name: 'Tamil Nadu', exact: true }).click();
+    await page.getByRole('button', { name: 'Save & Continue' }).click();
+    await expect(country).toBeHidden();
+  }
+
+  for (const route of ['/home', '/messages', '/people', '/search?q=design', '/notifications', '/settings', '/profile/edit']) {
+    await page.goto(route);
+    await expect(page).not.toHaveURL(/\/signin$/);
+    await expect(page.locator('main')).toBeVisible();
+    await page.reload();
+    await expect(page).not.toHaveURL(/\/signin$/);
+    await expect(page.locator('main')).toBeVisible();
+  }
+});
+
+test('successful registration shows the centered welcome moment for 4.5 seconds', async ({ page }) => {
+  test.skip(test.info().project.name !== 'edge', 'Run once against the shared isolated E2E database.');
+  test.setTimeout(90_000);
+
+  await page.goto('/signup');
+  await page.getByRole('textbox', { name: 'Full Name' }).fill('Welcome Test User');
+  await page.getByRole('textbox', { name: 'Work or Personal Email' }).fill(`welcome-${Date.now()}@example.test`);
+  await page.getByRole('button', { name: 'Student' }).click();
+  await page.getByRole('textbox', { name: 'College or School Name' }).fill('Vuprise Test College');
+  await page.getByRole('textbox', { name: 'Course or Field of Study' }).fill('Software Engineering');
+  await page.getByRole('spinbutton', { name: 'Course Start Year' }).fill('2025');
+  await page.locator('input[name="password"]').fill('welcome-test-password');
+  await page.locator('input[name="confirmPassword"]').fill('welcome-test-password');
+  await page.getByRole('button', { name: 'Create Account' }).click();
+
+  await expect(page).toHaveURL(/\/home$/);
+  const welcome = page.getByRole('status');
+  await expect(welcome).toContainText('Welcome to Vuprise');
+  await expect(welcome).toBeVisible();
+  await page.waitForTimeout(3600);
+  await expect(welcome).toBeVisible();
+  await expect(welcome).toBeHidden({ timeout: 6000 });
+});
+
+test('landing and sign-up pages have no serious automated accessibility violations', async ({ page }) => {
+  for (const route of ['/', '/signup']) {
+    await page.goto(route);
+    const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa']).analyze();
+    const serious = results.violations.filter(({ impact }) => ['critical', 'serious'].includes(impact));
+    expect(serious, `${route}: ${serious.map(({ id, help }) => `${id} ${help}`).join('; ')}`).toEqual([]);
+  }
+});
+
+test('public page layouts have no horizontal overflow at target viewport widths', async ({ page }) => {
+  for (const route of ['/', '/signin', '/signup']) {
+    await page.goto(route);
+    for (const width of [320, 375, 390, 768, 1024, 1366, 1920]) {
+      await page.setViewportSize({ width, height: width < 500 ? 812 : 900 });
+      const { viewport, content } = await page.evaluate(() => ({
+        viewport: document.documentElement.clientWidth,
+        content: document.documentElement.scrollWidth,
+      }));
+      expect(content, `${route} overflows at ${width}px`).toBeLessThanOrEqual(viewport + 1);
+    }
+  }
+});

@@ -212,10 +212,10 @@ const CreatePostCard = ({ onPostCreated, showTrigger = true, open, onOpenChange 
             value={content}
             onChange={(e) => setContent(e.target.value)}
             variant="standard"
-            InputProps={{
+            slotProps={{ input: {
               disableUnderline: true,
               sx: { fontSize: '1.05rem', lineHeight: 1.6 }
-            }}
+            }}}
           />
 
           {/* Hidden Image Input */}

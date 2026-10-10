@@ -201,7 +201,7 @@ const SettingsPage = () => {
                     Use a unique passphrase with at least 16 characters. You’ll need it to restore this key on another device.
                   </Typography>
                   <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5}>
-                    <PasswordTextField label="Recovery passphrase (min. 16 characters)" size="small" value={backupPassphrase} onChange={(event) => setBackupPassphrase(event.target.value)} inputProps={{ minLength: 16 }} required fullWidth />
+                    <PasswordTextField label="Recovery passphrase (min. 16 characters)" size="small" value={backupPassphrase} onChange={(event) => setBackupPassphrase(event.target.value)} slotProps={{ htmlInput: { minLength: 16 } }} required fullWidth />
                     <Button type="submit" variant="contained" disabled={savingBackup || backupPassphrase.length < 16} sx={{ flexShrink: 0 }}>
                       {savingBackup ? <CircularProgress size={18} color="inherit" /> : 'Save backup'}
                     </Button>

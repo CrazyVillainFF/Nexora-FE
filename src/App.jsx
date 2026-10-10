@@ -108,8 +108,8 @@ function App() {
                 <Route path="/search" element={<SearchPage />} />
                 <Route path="/notifications" element={<NotificationsPage />} />
                 <Route path="/settings" element={<SettingsPage />} />
-                <Route path="*" element={<NotFoundPage />} />
               </Route>
+              <Route path="*" element={<NotFoundPage />} />
             </Routes>
             <GlobalGhostCursor />
           </BrowserRouter>

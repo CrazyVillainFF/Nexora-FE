@@ -7,12 +7,12 @@ import CountryRegionSelector from './CountryRegionSelector';
 const emptyLocation = { country: '', countryCode: '', region: '', regionCode: '' };
 
 const LocationOnboardingDialog = () => {
-  const { user, isAuthenticated, loading: authLoading, updateUser } = useAuth();
+  const { user, isAuthenticated, loading: authLoading, updateUser, welcomeMessage } = useAuth();
   const [selection, setSelection] = useState(emptyLocation);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
-  const open = Boolean(!authLoading && isAuthenticated && user && (!user.locationCountryCode || !user.locationRegion));
+  const open = Boolean(!authLoading && !welcomeMessage && isAuthenticated && user && (!user.locationCountryCode || !user.locationRegion));
 
   useEffect(() => {
     if (open) {
