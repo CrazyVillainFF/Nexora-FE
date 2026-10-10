@@ -5,9 +5,9 @@
   display: grid;
   place-items: center;
   overflow: hidden;
-  padding: 24px;
+  padding: 16px;
   pointer-events: none;
-  animation: welcome-moment-fade 4s ease both;
+  animation: welcome-moment-fade 5s ease both;
 }
 
 .welcome-moment__accessible {
@@ -22,20 +22,20 @@
 
 .welcome-moment__title {
   margin: 0;
-  color: #f5fbff;
-  font-size: clamp(2rem, 6vw, 4.5rem);
+  color: #fff;
+  font-size: clamp(1rem, 6vw, 4.5rem);
   font-weight: 800;
   letter-spacing: -0.045em;
   line-height: 1.15;
   text-align: center;
-  text-wrap: balance;
+  white-space: nowrap;
   text-shadow: 0 3px 28px rgb(24 193 231 / 44%);
 }
 
 .welcome-moment__glyph {
   display: inline-block;
   min-width: 0.58em;
-  color: #bcefff;
+  color: #fff;
   animation: glyph-lottery-lock 360ms cubic-bezier(.2, .75, .25, 1) both;
   animation-delay: calc(var(--glyph-index) * 90ms);
 }

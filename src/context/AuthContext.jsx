@@ -69,7 +69,7 @@ export const AuthProvider = ({ children }) => {
 
       setToken(receivedToken);
       setUser(receivedUser);
-      setWelcomeMessage('Welcome back to Vuprise');
+      setWelcomeMessage('Welcome back To Vuprise');
       return { success: true, user: receivedUser };
     } catch (err) {
       const msg = err.message || 'Login failed. Please check your credentials.';
