@@ -6,97 +6,62 @@
   place-items: center;
   overflow: hidden;
   padding: 24px;
-  background: color-mix(in srgb, #06111a 66%, transparent);
-  backdrop-filter: blur(8px);
   pointer-events: none;
-  animation: welcome-moment-backdrop 4.5s ease both;
+  animation: welcome-moment-fade 4s ease both;
 }
 
-.welcome-moment__glow {
+.welcome-moment__accessible {
   position: absolute;
-  width: min(78vw, 640px);
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgb(43 197 232 / 24%), rgb(43 197 232 / 0%) 68%);
-  animation: welcome-moment-glow 4.5s ease both;
-}
-
-.welcome-moment__card {
-  position: relative;
-  width: min(100%, 560px);
-  padding: clamp(30px, 7vw, 58px) clamp(24px, 7vw, 64px);
-  border: 1px solid rgb(122 215 239 / 34%);
-  border-radius: 28px;
-  background: linear-gradient(145deg, rgb(26 43 56 / 96%), rgb(11 23 33 / 98%));
-  box-shadow: 0 32px 100px rgb(0 0 0 / 42%), inset 0 1px 0 rgb(255 255 255 / 9%);
-  color: #f5fbff;
-  text-align: center;
-  animation: welcome-moment-card 4.5s cubic-bezier(.2,.75,.25,1) both;
-}
-
-.welcome-moment__mark {
-  display: grid;
-  width: 58px;
-  height: 58px;
-  margin: 0 auto 24px;
-  place-items: center;
-  border: 1px solid rgb(255 255 255 / 24%);
-  border-radius: 19px;
-  background: linear-gradient(145deg, #23c8ed, #1485d0);
-  box-shadow: 0 10px 38px rgb(31 191 230 / 30%);
-  color: #fff;
-}
-
-.welcome-moment__mark svg {
-  font-size: 31px;
-}
-
-.welcome-moment__eyebrow {
-  margin: 0 0 12px;
-  color: #85d8f2;
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: .2em;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  clip-path: inset(50%);
 }
 
 .welcome-moment__title {
   margin: 0;
-  font-size: clamp(28px, 6vw, 43px);
+  color: #f5fbff;
+  font-size: clamp(2rem, 6vw, 4.5rem);
   font-weight: 800;
-  letter-spacing: -.045em;
-  line-height: 1.12;
+  letter-spacing: -0.045em;
+  line-height: 1.15;
+  text-align: center;
+  text-wrap: balance;
+  text-shadow: 0 3px 28px rgb(24 193 231 / 44%);
 }
 
-.welcome-moment__caption {
-  margin: 16px 0 0;
-  color: #b8c9d5;
-  font-size: 15px;
+.welcome-moment__glyph {
+  display: inline-block;
+  min-width: 0.58em;
+  color: #bcefff;
+  animation: glyph-lottery-lock 360ms cubic-bezier(.2, .75, .25, 1) both;
+  animation-delay: calc(var(--glyph-index) * 90ms);
 }
 
-@keyframes welcome-moment-backdrop {
-  0%, 5% { opacity: 0; }
-  10%, 97% { opacity: 1; }
+.welcome-moment__space {
+  display: inline-block;
+  width: 0.28em;
+}
+
+@keyframes welcome-moment-fade {
+  0%, 4% { opacity: 0; }
+  12%, 86% { opacity: 1; }
   100% { opacity: 0; }
 }
 
-@keyframes welcome-moment-glow {
-  0% { opacity: 0; transform: scale(.7); }
-  10%, 97% { opacity: 1; transform: scale(1); }
-  100% { opacity: 0; transform: scale(1.12); }
-}
-
-@keyframes welcome-moment-card {
-  0% { opacity: 0; transform: translateY(18px) scale(.94); }
-  10%, 97% { opacity: 1; transform: translateY(0) scale(1); }
-  100% { opacity: 0; transform: translateY(-8px) scale(1.015); }
+@keyframes glyph-lottery-lock {
+  from { opacity: 0.35; filter: blur(5px); transform: translateY(0.22em) rotateX(70deg); }
+  to { opacity: 1; filter: blur(0); transform: translateY(0) rotateX(0); }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .welcome-moment,
-  .welcome-moment__glow,
-  .welcome-moment__card {
+  .welcome-moment__glyph {
     animation: none;
     opacity: 1;
+    filter: none;
     transform: none;
   }
 }

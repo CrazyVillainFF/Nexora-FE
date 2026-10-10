@@ -13,7 +13,7 @@ const MainLayout = () => {
 
   useEffect(() => {
     if (!welcomeMessage) return undefined;
-    const timeout = window.setTimeout(clearWelcomeMessage, 4500);
+    const timeout = window.setTimeout(clearWelcomeMessage, 4000);
     return () => window.clearTimeout(timeout);
   }, [welcomeMessage, clearWelcomeMessage]);
 
