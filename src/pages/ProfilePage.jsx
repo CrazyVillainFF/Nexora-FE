@@ -27,6 +27,7 @@ import ShareOutlinedIcon from '@mui/icons-material/ShareOutlined';
 import CameraAltOutlinedIcon from '@mui/icons-material/CameraAltOutlined';
 import SchoolOutlinedIcon from '@mui/icons-material/SchoolOutlined';
 import WorkOutlineOutlinedIcon from '@mui/icons-material/WorkOutlineOutlined';
+import SportsEsportsRoundedIcon from '@mui/icons-material/SportsEsportsRounded';
 
 import { useAuth } from '../context/AuthContext';
 import { userAPI, postAPI } from '../services/api';
@@ -244,6 +245,7 @@ const ProfilePage = () => {
             direction="row"
             spacing={1.5}
             sx={{
+              flexWrap: 'wrap',
               position: { sm: 'absolute' },
               top: { sm: 20 },
               right: { sm: 32 },
@@ -251,14 +253,24 @@ const ProfilePage = () => {
             }}
           >
             {isOwnProfile ? (
-              <Button
-                variant="contained"
-                color="primary"
-                startIcon={<EditOutlinedIcon />}
-                onClick={() => navigate('/profile/edit')}
-              >
-                Edit Profile
-              </Button>
+              <>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  startIcon={<EditOutlinedIcon />}
+                  onClick={() => navigate('/profile/edit')}
+                >
+                  Edit Profile
+                </Button>
+                <Button
+                  variant="outlined"
+                  color="primary"
+                  startIcon={<SportsEsportsRoundedIcon />}
+                  onClick={() => navigate('/satisfied-games')}
+                >
+                  Try Satisfied Games
+                </Button>
+              </>
             ) : (
               <ConnectionButton
                 userId={profile._id}

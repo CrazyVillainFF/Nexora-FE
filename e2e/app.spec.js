@@ -6,6 +6,7 @@ const publicRoutes = [
   ['/signin', /Welcome back to Vuprise/i],
   ['/signup', /Join Vuprise/i],
   ['/forgot-password', /Reset your password/i],
+  ['/satisfied-games', /Satisfied Games/i],
 ];
 
 test('public routes render without uncaught errors or failed local assets', async ({ page }) => {
@@ -64,6 +65,42 @@ test('protected deep links send visitors to sign-in and unknown routes show a 40
   await expect(page.getByText('Page Not Found')).toBeVisible();
 });
 
+test('satisfied games page switches between all three interactive previews', async ({ page }) => {
+  await page.goto('/satisfied-games');
+  await expect(page.getByRole('heading', { name: 'Satisfied Games' })).toBeVisible();
+  await expect(page.getByRole('tab', { name: /Binary Orbits/ })).toHaveAttribute('aria-selected', 'true');
+  await expect(page.getByRole('slider', { name: 'Spiral arms' })).toHaveCount(0);
+  await page.getByRole('button', { name: 'Edit' }).click();
+  await expect(page.getByRole('slider', { name: 'Pointer response' })).toBeVisible();
+  await expect(page.locator('[aria-label="Interactive tilted spiral galaxy preview"]')).toBeVisible();
+  const galaxyCanvas = page.locator('canvas[aria-label="Touch and drag to swirl existing stars through their orbits"]');
+  await expect(galaxyCanvas).toBeVisible();
+  await expect.poll(async () => Number(await galaxyCanvas.getAttribute('data-orbit-stars'))).toBeGreaterThan(2000);
+  await galaxyCanvas.evaluate((canvas) => {
+    const rect = canvas.getBoundingClientRect();
+    const x = rect.left + rect.width * 0.28; const y = rect.top + rect.height * 0.5;
+    canvas.dispatchEvent(new PointerEvent('pointerdown', { pointerType: 'touch', pointerId: 1, clientX: x, clientY: y, bubbles: true }));
+    canvas.dispatchEvent(new PointerEvent('pointermove', { pointerType: 'touch', pointerId: 1, buttons: 1, clientX: rect.left + rect.width * 0.4, clientY: y, bubbles: true }));
+  });
+  await page.waitForTimeout(80);
+  await expect.poll(async () => Number(await galaxyCanvas.getAttribute('data-reacted-stars'))).toBeGreaterThan(0);
+  await expect(galaxyCanvas).toHaveAttribute('data-pointer-active', 'true');
+  await galaxyCanvas.evaluate((canvas) => canvas.dispatchEvent(new PointerEvent('pointerup', { pointerType: 'touch', bubbles: true })));
+  await page.getByRole('tab', { name: /Shatter Type/ }).click();
+  await expect(page.getByRole('button', { name: 'Shatter headline' })).toBeVisible();
+  await page.getByRole('button', { name: 'Shatter headline' }).click();
+  await expect(page.getByRole('button', { name: 'Reassemble headline' })).toBeVisible();
+  await page.getByRole('button', { name: 'Reassemble headline' }).click();
+  await expect(page.getByRole('button', { name: 'Shatter headline' })).toBeVisible();
+  await page.getByRole('textbox', { name: 'Headline' }).fill('Interactive test');
+  await expect(page.locator('canvas[aria-label="Interactive glass-shard headline: Interactive test"]')).toBeVisible();
+  await expect(page.locator('.satisfied-shatter__full-text')).toHaveText('Interactive test');
+  await page.getByRole('tab', { name: /Stardust Cursor/ }).click();
+  await expect(page.getByRole('heading', { name: 'Stardust Cursor' })).toBeVisible();
+  await expect(page.getByRole('slider', { name: 'Wake softness' })).toBeVisible();
+  await expect(page.getByText(/soft, flowing dust wake/i)).toBeVisible();
+});
+
 test('isolated seeded account can sign in and protected pages survive direct loads and refreshes', async ({ page }) => {
   test.setTimeout(150_000);
   await page.goto('/signin');
@@ -82,6 +119,7 @@ test('isolated seeded account can sign in and protected pages survive direct loa
     await page.waitForTimeout(3600);
     await expect(welcome).toBeVisible();
     await expect(welcome).toBeHidden({ timeout: 6000 });
+    await expect(page.getByRole('dialog', { name: /Try Satisfied Games/i })).toBeVisible({ timeout: 3000 });
 
     const like = page.locator('.post-like-heart').first();
     await expect(like).toBeVisible();
@@ -152,7 +190,7 @@ test('landing and sign-up pages have no serious automated accessibility violatio
 });
 
 test('public page layouts have no horizontal overflow at target viewport widths', async ({ page }) => {
-  for (const route of ['/', '/signin', '/signup']) {
+  for (const route of ['/', '/signin', '/signup', '/satisfied-games']) {
     await page.goto(route);
     for (const width of [320, 375, 390, 768, 1024, 1366, 1920]) {
       await page.setViewportSize({ width, height: width < 500 ? 812 : 900 });

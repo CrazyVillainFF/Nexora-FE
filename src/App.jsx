@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Box, CircularProgress, useMediaQuery } from '@mui/material';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { NotificationProvider } from './context/NotificationContext';
@@ -25,6 +25,8 @@ import SettingsPage from './pages/SettingsPage';
 import NotFoundPage from './pages/NotFoundPage';
 import MessagesPage from './pages/MessagesPage';
 import PostDetailsPage from './pages/PostDetailsPage';
+import SatisfiedGamesPage from './pages/SatisfiedGamesPage';
+import SatisfiedGamesPrompt from './components/SatisfiedGamesPrompt';
 
 const GhostCursor = React.lazy(() => import('./components/reactbits/GhostCursor'));
 
@@ -32,8 +34,9 @@ function GlobalGhostCursor() {
   const reduceMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
   const coarsePointer = useMediaQuery('(pointer: coarse)');
   const { mode } = useThemeMode();
+  const location = useLocation();
 
-  if (reduceMotion || coarsePointer) return null;
+  if (reduceMotion || coarsePointer || location.pathname === '/satisfied-games') return null;
 
   return (
     <React.Suspense fallback={null}>
@@ -82,6 +85,7 @@ function App() {
               {/* Public Root / Landing */}
               <Route element={<MainLayout />}>
                 <Route path="/" element={<RootRedirect />} />
+                <Route path="/satisfied-games" element={<SatisfiedGamesPage />} />
               </Route>
 
               {/* Authentication Routes */}
@@ -112,6 +116,7 @@ function App() {
               <Route path="*" element={<NotFoundPage />} />
             </Routes>
             <GlobalGhostCursor />
+            <SatisfiedGamesPrompt />
           </BrowserRouter>
         </NotificationProvider>
       </AuthProvider>
